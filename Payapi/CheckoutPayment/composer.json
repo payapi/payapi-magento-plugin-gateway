@@ -1,0 +1,22 @@
+{
+  "name": "payapi/checkoutpayment",
+  "description": "Integrating the PayApi Gateway in Magento2",
+  "type": "magento2-module",
+  "version": "1.0.0",
+  "license": ["MIT"],
+  "require": {
+    "php": "~5.5.0|~5.6.0",
+    "magento/magento-composer-installer": "*",
+    "magento/module-sales": "*",
+    "magento/module-payment": "*",
+    "magento/module-quote": "*"
+  },
+  "extra": {
+    "map": [
+      [
+        "*",
+        "Payapi/CheckoutPayment"
+      ]
+    ]
+  }
+}

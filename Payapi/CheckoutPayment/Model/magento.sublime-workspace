@@ -1,0 +1,962 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"_lo",
+				"_logger2"
+			],
+			[
+				"curren",
+				"currencyCode"
+			],
+			[
+				"mycustomm",
+				"mycustommethod"
+			],
+			[
+				"is",
+				"isSelect"
+			],
+			[
+				"min",
+				"min-width"
+			],
+			[
+				"web",
+				"webkitForce"
+			],
+			[
+				"alter",
+				"alternativeUrl"
+			],
+			[
+				"isAndroid",
+				"isAndroidBrowser"
+			],
+			[
+				"title",
+				"titleMax"
+			],
+			[
+				"payapi",
+				"payapiActions"
+			],
+			[
+				"curre",
+				"currentLength"
+			],
+			[
+				"do",
+				"document"
+			],
+			[
+				"sharedV",
+				"sharedViaString"
+			],
+			[
+				"payap",
+				"payapiActions"
+			],
+			[
+				"fng",
+				"fngrsharesdkcontroller"
+			],
+			[
+				"fngr",
+				"fngrsharesdkcontroller"
+			],
+			[
+				"closed",
+				"closedPopup"
+			],
+			[
+				"retu",
+				"returningCookie"
+			],
+			[
+				"read",
+				"readCookie"
+			],
+			[
+				"clos",
+				"closedPopup"
+			],
+			[
+				"fngrsharesdk-",
+				"fngrsharesdk-share"
+			],
+			[
+				"e",
+				"element"
+			],
+			[
+				"ic_fn",
+				"ic_fngrapp_rounded"
+			],
+			[
+				"fnrshare",
+				"fngrsharesdk-product"
+			],
+			[
+				"req",
+				"require"
+			],
+			[
+				"isRetur",
+				"isReturningUrl"
+			],
+			[
+				"paddi",
+				"padding-bottom"
+			],
+			[
+				"pay",
+				"payapiActions"
+			],
+			[
+				"paya",
+				"payapiActions"
+			],
+			[
+				"targ",
+				"targetName"
+			],
+			[
+				"tar",
+				"targetName"
+			],
+			[
+				"fngrsharesdk",
+				"fngrsharesdkcontroller"
+			],
+			[
+				"sh",
+				"sh_webshopicon"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"scr",
+				"scrollTop"
+			],
+			[
+				"orientation",
+				"orientationchange"
+			],
+			[
+				"w",
+				"wOrig"
+			],
+			[
+				"fngrto",
+				"fngrtouch"
+			],
+			[
+				"page",
+				"pageX"
+			],
+			[
+				"te",
+				"tempItem"
+			],
+			[
+				"x",
+				"xPos"
+			],
+			[
+				"selected",
+				"selectedDropItem"
+			],
+			[
+				"th",
+				"thumbnail"
+			],
+			[
+				"selec",
+				"selectedDropItem"
+			],
+			[
+				"fngrsha",
+				"fngrsharesdkcontroller"
+			],
+			[
+				"isMobi",
+				"isMobile"
+			],
+			[
+				"fngrs",
+				"fngrsharesdkuiclass"
+			],
+			[
+				"stagin",
+				"staging-input"
+			],
+			[
+				"i",
+				"isIOS"
+			],
+			[
+				"isFn",
+				"isFngrShareMobileIOS"
+			],
+			[
+				"max",
+				"max-width"
+			],
+			[
+				"bac",
+				"background-color"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "SecureFormPost.php",
+			"settings":
+			{
+				"buffer_size": 10279,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "<div class=\"payment-method\" data-bind=\"css: {'_active': (getCode() == isChecked())}\">\n    <div class=\"payment-method-title field choice\">\n        <input type=\"radio\"\n               name=\"payment[method]\"\n               class=\"radio\"\n               data-bind=\"attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()\"/>\n        <label data-bind=\"attr: {'for': getCode()}\" class=\"label\"><span data-bind=\"text: getTitle()\"></span></label>\n    </div>\n    <div class=\"payment-method-content\">\n        <div class=\"payment-method-billing-address\">\n            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->\n            <!-- ko template: getTemplate() --><!-- /ko -->\n            <!--/ko-->\n        </div>\n        <div class=\"checkout-agreements-block\">\n            <!-- ko foreach: $parent.getRegion('before-place-order') -->\n            <!-- ko template: getTemplate() --><!-- /ko -->\n            <!--/ko-->\n        </div>\n        <div>\n            <?php echo \"hola\"; ?>\n        </div>\n        <div class=\"actions-toolbar\">\n            <div class=\"primary\">\n                <button class=\"action primary checkout\"\n                        type=\"submit\"\n                        data-bind=\"\n                        click: placeOrder,\n                        attr: {title: $t('Place Order')},\n                        css: {disabled: !isPlaceOrderActionAllowed()},\n                        enable: (getCode() == isChecked())\n                        \"\n                        disabled>\n                    <span data-bind=\"text: $t('Place Order')\"></span>\n                </button>\n            </div>\n        </div>\n    </div>\n</div>",
+			"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/template/payment/secure-form-post.phtml",
+			"file_size": 1705,
+			"file_write_time": 131236950360000000,
+			"settings":
+			{
+				"buffer_size": 1707,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/layout/checkout_index_index.xml",
+			"settings":
+			{
+				"buffer_size": 2999,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log/francisco.log",
+			"settings":
+			{
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log/system.log",
+			"settings":
+			{
+				"buffer_size": 5952,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/magento.sublime-project",
+			"settings":
+			{
+				"buffer_size": 147,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 87.0,
+		"last_filter": "install",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 485.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/Block",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/Block/Product",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/Block/Product/View",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/etc",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/view",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/view/frontend",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/view/frontend/layout",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/view/frontend/templates",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/view/frontend/templates/product",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/view/frontend/templates/product/view",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/view/frontend/web/js",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/etc",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/etc/adminhtml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/Model",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/layout",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/js",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/js/view",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/js/view/payment",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/js/view/payment/method-renderer",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/template",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/template/payment",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/var",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/var/tmp"
+	],
+	"file_history":
+	[
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/template/payment/secure-form-post.phtml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log/francisco.txt",
+		"/Users/franciscopayapi/Library/Application Support/Sublime Text 3/Packages/Xdebug Client/Xdebug.sublime-settings",
+		"/Applications/magento-2.1.2-0/php/etc/php.ini",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log/exception.log",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log/debug.log",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log/system.log",
+		"/Applications/MAMP/htdocs/saveLog.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/etc/adminhtml/system.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/Model/SecureFormPost.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/CodeByJoe/ArticlePayment/etc/config.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/CodeByJoe/ArticlePayment/etc/adminhtml/system.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/js/view/payment/method-renderer.js",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/CodeByJoe/ArticlePayment/Model/MethodOne.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/etc/config.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/etc/module.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/etc/payment.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/js/view/payment/method-renderer/secure-form-post.js",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/composer.json",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/registration.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/layout/checkout_index_index.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/CodeByJoe/ArticlePayment/etc/module.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/CodeByJoe/ArticlePayment/view/frontend/web/js/view/payment/method-renderer.js",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Secureform/etc/module.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Secureform/etc/config.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Secureform/view/frontend/web/js/view/payment/method-renderer/payapigateway-method.js",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Secureform/view/frontend/layout/checkout_index_index.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Inchoo/Stripe/etc/adminhtml/system.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Inchoo/Stripe/composer.json",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Inchoo/Stripe/view/frontend/web/template/payment/stripe-form.html",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Inchoo/Stripe/etc/config.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Inchoo/Stripe/Model/Payment.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/etc/config.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/etc/payment.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/etc/module.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/Model/MyCustomMethod.php",
+		"/Users/franciscopayapi/Desktop/TestApp/Podfile",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/vendor/magento/module-payment/Test/Unit/Model/Method/AbstractMethodTest.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/Model/PaymentProviderInterface.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Catalog/Block/Product/View/Secureform.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/etc/adminhtml/system.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/view/frontend/web/js/view/payment/method-renderer/payapi-method.js",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/view/frontend/web/js/view/payment/payapi-payments.js",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/view/frontend/web/template/payment/payapi-form.html",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/view/frontend/layout/checkout_index_index.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/etc/frontend/di.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/vendor/magento/module-offline-payments/Model/Cashondelivery.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Inchoo/Stripe/etc/frontend/di.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/registration.php",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/Payment/composer.json",
+		"/Users/franciscopayapi/.bash_profile",
+		"/Applications/MAMP/htdocs/payapidemo.html",
+		"/Users/franciscopayapi/Documents/Indotalk/ios/Podfile",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/TestModule/etc/routes.xml",
+		"/Applications/magento-2.1.2-0/apps/magento/htdocs/app/etc/config.php",
+		"/private/var/folders/fn/wldqdcmx1p17sj0ztw5mvvr80000gn/T/fz3temp-1/config.php",
+		"/private/var/folders/fn/wldqdcmx1p17sj0ztw5mvvr80000gn/T/fz3temp-1/registration.php",
+		"/private/var/folders/fn/wldqdcmx1p17sj0ztw5mvvr80000gn/T/fz3temp-1/composer.json",
+		"/Users/franciscopayapi/Downloads/Magento-CE-2.1.2_sample_data-2016-10-11-11-24-30/setup/index.php",
+		"/Users/franciscopayapi/Documents/Payapi/Android/PayApiSDK/PayApiSDK/README.md",
+		"/Users/franciscopayapi/Desktop/publish-bitbucket.gradle.txt",
+		"/Users/franciscopayapi/Desktop/franciscotest/README.md",
+		"/Users/franciscopayapi/fngrshare-sdk-js/fngrsharesdk/sdk-controller.js",
+		"/Applications/MAMP/htdocs/php-getting-started/web/.htaccess",
+		"/Applications/MAMP/htdocs/php-getting-started/composer.json",
+		"/Users/franciscopayapi/Desktop/php-getting-started/web/index.php",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDKTest/Prueba/Podfile",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/PayApiSDK.podspec",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/README.md",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/PayapiSDK/PayapiSDK.podspec",
+		"/Users/franciscopayapi/Desktop/Prueba/Prueba/Podfile",
+		"/Users/franciscopayapi/Desktop/README.md",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/testapp/Podfile",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/PayapiSDK.podspec",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/PayapiSDKTest.xcworkspace/contents.xcworkspacedata",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/PayapiSDK/Podfile",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/PayapiSDK/.gitmodules",
+		"/Applications/MAMP/htdocs/payapi-sdk.js",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/PayapiSDK/Cartfile",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayapiSDK/.gitmodules",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/PayApiiOSLibrary/PayApiiOSLibrary/iospayapilib/Podfile",
+		"/Users/franciscopayapi/Downloads/payapi-sdk-js-master-e1aab2a072a31ee09d3cc8c40d53578638f248e2/payapi-sdk.js",
+		"/Users/franciscopayapi/Downloads/payapi-sdk-js-master-e1aab2a072a31ee09d3cc8c40d53578638f248e2/README.md",
+		"/Users/franciscopayapi/.ssh/known_hosts",
+		"/Users/franciscopayapi/Downloads/res/values/styles_example.xml",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/eesee/projects/ios/EeSeeFastfingersApp/EeSeeFastfingersApp/ChatViewController.swift",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/eesee/projects/ios/EeSeeFastfingersApp/EeSeeFastfingersApp/Assets.xcassets/FeelFinnair/FeelFinnairLaunch.imageset/Contents.json",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/eesee/projects/ios/EeSeeFastfingersApp/Podfile",
+		"/Users/franciscopayapi/Downloads/Software/franscisco-vpn/mytemplate.ovpn",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/touch.js",
+		"/Applications/MAMP/htdocs/3d/3dtouch.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk.css",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk-min/sdk-controller.min.js",
+		"/Applications/MAMP/htdocs/webshop-js/create_release-min_package.sh",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk-min/touch.min.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk-min/sdk-ui.min.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/touch.obf.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk-ui.obf.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk.min.css",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk-controller.obf.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk-min/sdk.min.css",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/config.json.template",
+		"/Applications/MAMP/htdocs/webshop-js/demo-obf.html",
+		"/Applications/MAMP/htdocs/webshop-js/demo-min.html",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/config.js",
+		"/Applications/MAMP/htdocs/webshop-js/popup.html",
+		"/Applications/MAMP/htdocs/webshop-js/popup.js",
+		"/Applications/MAMP/htdocs/webshop-js/popup.css",
+		"/Applications/MAMP/htdocs/webshop-js/demo.html",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk.css.min",
+		"/Applications/MAMP/htdocs/webshop-js/nodefile.js",
+		"/Users/franciscopayapi/Desktop/nodefile.js",
+		"/Users/franciscopayapi/Desktop/prueba.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk-controller.min.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/v3.6.txt",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk-controller.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/longpress.js",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk-ui.js",
+		"/Applications/MAMP/htdocs/webshop-js/test.html",
+		"/Applications/MAMP/htdocs/webshop-js/touch/fngrsharesdk/touch.js",
+		"/Applications/MAMP/htdocs/webshop-js/touch/fngrsharesdk/touch.css",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/sdk.js",
+		"/Applications/MAMP/htdocs/webshop-js/touch/demo.html",
+		"/Applications/MAMP/htdocs/cookies/index.html",
+		"/Applications/MAMP/htdocs/prueba.html",
+		"/Applications/MAMP/htdocs/webshop-js/fngrsharesdk/longpress.css",
+		"/Users/franciscopayapi/Documents/Payapi/iOS/eesee/projects/ios/EeSeeFastfingersApp/FngrShare/FngrShare/ShareChannelController.swift",
+		"/Users/franciscopayapi/Documents/Payapi/Android/antero-chat/gradle.properties"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"",
+			"htdocs/app/code",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"xdebug",
+			"francisco",
+			"monolog",
+			"logger",
+			"logger->debug",
+			"methodOne",
+			"method_one",
+			"codebyjoe",
+			"joe",
+			"codeby",
+			"method",
+			"codebyjoe_articlepayment_method_one",
+			"countryfactory",
+			"codebyjoe_articlepayment_method_one",
+			"debugreplacepr",
+			"form",
+			"Cctype",
+			"stripe",
+			"authorize_capture",
+			"MyCustomMethod",
+			"\\Magento\\Payment\\Model\\Method\\",
+			"payment_action",
+			":CODE",
+			"stripe",
+			"\\Magento\\Checkout\\Model\\ConfigProviderInterface",
+			"extends \\Magento\\Payment\\Model\\Method",
+			"payment[cc_number]",
+			"incho_stripe_cc",
+			"failure.phtml",
+			"social",
+			"check",
+			"artifacts",
+			"checkmanda",
+			"productpage",
+			"subs",
+			"webshopicon-small",
+			"openpayapi",
+			"_dragitems",
+			"fngrtouchdrag",
+			"}",
+			"{",
+			"CryptoJS",
+			" 	",
+			"chin",
+			"indo",
+			"indones",
+			"indonesi",
+			"	8 kHz, 16 kHz",
+			"bono",
+			"validatekeyformat",
+			"validatePublicIdFormat",
+			"input",
+			"prototype",
+			"legend",
+			"ActionBarTabStyle.Example",
+			"tab_",
+			"closec",
+			"close",
+			"fullpage",
+			"touches",
+			"getshop",
+			"android",
+			"openpagelink",
+			"substring",
+			"event",
+			"targetname",
+			"fngrshare",
+			"<div class=\"payapiProductIcon\"></div>",
+			"fngrsharesdk",
+			"non-selectable",
+			"fngrtouchdrag",
+			"sdk-",
+			"class",
+			"fngrt",
+			".png",
+			"overflow",
+			"fngrholder",
+			"thumbnail",
+			"sharedvia",
+			"shared",
+			"sharedv",
+			"share",
+			"shared",
+			"6000",
+			"payapiwebshop",
+			"split",
+			"isstaging",
+			"input",
+			"staging",
+			".template",
+			"init",
+			"staging",
+			".get",
+			"post",
+			"ajax",
+			"fail",
+			"timer",
+			"closedpopup",
+			"click",
+			"openpayapi",
+			"isreturningconsumer",
+			"showwe",
+			"showwebshoppopup(",
+			"showweb",
+			"8",
+			"<p",
+			"block",
+			"|| \"",
+			"payapishortener",
+			"-small",
+			"click",
+			"fngrsharesdk-pro",
+			"fngrsharesdk-procu",
+			"returning",
+			"payapitab",
+			"nextclose",
+			"iframe",
+			"targetname",
+			"callout",
+			"my_win",
+			"closet",
+			"checkclo",
+			"id=",
+			"closetab",
+			"checkFngrShareMobile",
+			".text(",
+			"targetname",
+			"visible"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"]",
+			"[",
+			"<string>",
+			"",
+			"(this.enabled)",
+			"$drpItems",
+			"$thumbnail"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 2,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "SecureFormPost.php",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10279,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								240,
+								283
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/web/template/payment/secure-form-post.phtml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1707,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1049,
+								1049
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/PHP/PHP.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/app/code/Payapi/CheckoutPayment/view/frontend/layout/checkout_index_index.xml",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 2999,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log/francisco.log",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 0,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/var/log/system.log",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5952,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/Applications/magento-2.1.2-0/apps/magento/htdocs/magento.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 147,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								100,
+								126
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.xdebug":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "magento.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 392.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+		"xdebug":
+		{
+			"hide_conflict": false,
+			"restore_index":
+			{
+				"115":
+				{
+					"group": 0,
+					"index": 0
+				},
+				"122":
+				{
+					"group": 0,
+					"index": 1
+				},
+				"201":
+				{
+					"group": 0,
+					"index": 3
+				},
+				"291":
+				{
+					"group": 0,
+					"index": 2
+				}
+			},
+			"restore_layout":
+			{
+				"cells":
+				[
+					[
+						0,
+						0,
+						1,
+						1
+					]
+				],
+				"cols":
+				[
+					0.0,
+					1.0
+				],
+				"rows":
+				[
+					0.0,
+					1.0
+				]
+			}
+		}
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 351.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<body>
+    <referenceContainer name="product.info.social">
+        <block class="Payapi\Catalog\Block\Product\View\Secureform"
+            name="product.view.secureform"
+            template="Payapi_Catalog::product/view/secureform.phtml"
+            after="-">
+        </block>
+    </referenceContainer>
+</body>

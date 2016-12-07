@@ -1,0 +1,13 @@
+
+<?php $secureFormData =  $this->getSecureFormData();?>;
+<div>
+<div id="secure-payment-button"></div>
+  <script>
+  require(['jquery','payapiSdk'],function($){
+  		var secureFormData = <?php echo $secureFormData;?>;  	
+		payapiSdk.configure('multimerchantshop', 'qETkgXpgkhNKYeFKfxxqKhgdahcxEFc9');
+		payapiSdk.addSecurePaymentButtonToDiv(secureFormData, 'secure-payment-button', 'Buy now');
+	});
+  </script>
+<h3 id="log"><?php echo '2'.$secureFormData;?></h3>
+</div>
