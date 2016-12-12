@@ -7,6 +7,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_customlogger;
     protected $_productRepository;
     protected $_orderFactory;
+    protected $_invoiceSender;
      /**
     * @param Magento\Framework\App\Helper\Context $context
     * @param Magento\Store\Model\StoreManagerInterface $storeManager
@@ -29,7 +30,11 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Quote\Api\CartRepositoryInterface $cartRepositoryInterface,
         \Magento\Quote\Api\CartManagementInterface $cartManagementInterface,
         \Magento\Quote\Model\Quote\Address\Rate $shippingRate,
-        \Payapi\CheckoutPayment\Logger\Logger $customlogger
+        \Payapi\CheckoutPayment\Logger\Logger $customlogger,
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
+        \Magento\Sales\Model\Service\InvoiceService $invoiceService,
+        \Magento\Framework\DB\Transaction $transaction,
+        \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender
     ) {
         $this->_storeManager = $storeManager;
         $this->_productFactory = $productFactory;
@@ -43,6 +48,10 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_customlogger = $customlogger;
         $this->_productRepository = $productRepository;
         $this->_orderFactory = $orderFactory;
+        $this->_orderRepository = $orderRepository;
+        $this->_invoiceService = $invoiceService;
+        $this->_transaction = $transaction;
+        $this->_invoiceSender = $invoiceSender;
         parent::__construct($context);
     }
 
@@ -54,7 +63,6 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
      * 
     */
     public function createMageOrder($orderData) {
-        $this->_customlogger->debug("Create Mage Order ".json_encode($orderData));
         $store=$this->_storeManager->getStore();
         $websiteId = $this->_storeManager->getStore()->getWebsiteId();
         $customer=$this->customerFactory->create();
@@ -71,11 +79,9 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $cart->setCurrency();
 
         if($customer->getEntityId()){            
-            $this->_customlogger->debug("user registered!");
             $customer= $this->customerRepository->getById($customer->getEntityId());
             $cart->assignCustomer($customer); //Assign quote to customer
         }else{           
-            $this->_customlogger->debug("user is GUEST!");
             $cart->setCustomerIsGuest(true);
         }
         $cart->setCustomerEmail($orderData['email']);
@@ -84,11 +90,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         //add items in quote
         foreach($orderData['items'] as $item){
-            //$product = $this->_productFactory->create()->load(); //intval($item['product_id'])
-            //$product = $objectManager->get('Magento\Catalog\Model\Product')->load($item['product_id']);
             $product = $this->_productRepository->getById(intval($item['product_id']),false,$store->getId());
-            $this->_customlogger->debug($product->getName());
-            $this->_customlogger->debug(json_encode($product));
             $cart->addProduct(
                 $product,
                 intval($item['qty'])
@@ -118,32 +120,47 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $cart->save();
 
         $cart = $this->cartRepositoryInterface->get($cart->getId());
-        //$order_id = $this->cartManagementInterface->placeOrder($cart->getId());
+        $order_id = $this->cartManagementInterface->placeOrder($cart->getId());
         
-        /*$order = $this->_orderFactory->create()->load($order_id);
-        $invoices = $order->getInvoiceCollection();
-        foreach ($invoices as $invoice){
-            $invoice->delete();
+        return $order_id;
+    }
+
+
+    public function addPayment($orderId){
+        $order = $this->_orderRepository->get($orderId);
+        if($order && $order->canInvoice()) {
+            $invoice = $this->_invoiceService->prepareInvoice($order);
+            $invoice->register();
+            $invoice->save();
+            $transactionSave = $this->_transaction->addObject(
+                $invoice
+            )->addObject(
+                $invoice->getOrder()
+            );
+            $transactionSave->save();
+            $this->_invoiceSender->send($invoice);
+            //send notification code
+
+            $order->setState("processing")->setStatus("processing");
+            $order->addStatusHistoryComment(
+                __('Notified customer about invoice #%1.', $invoice->getId())
+            )
+            ->setIsCustomerNotified(true)
+            ->save();
+            $this->changeStatus($orderId, "processing","processing");
+            return $orderId;
         }
- 
-        $order->setState("pending")->setStatus("pending");
+        throw new \Magento\Framework\Exception\LocalizedException(__('Could not add Payment to the order.'));
+    }
+
+    public function changeStatus($orderId, $state,$status){
+        $order = $this->_orderRepository->get($orderId);
+
+        $order->setState($state)->setStatus($status);
  
         $order->save();
-*/
-        $result = ['order_id' => '$order_id'];
-        return json_encode($result);
-/*
-
-
-
-
-        $order->setEmailSent(0);
-        $increment_id = $order->getRealOrderId();
-        if($order->getEntityId()){
-            $result['order_id']= $order->getRealOrderId();
-        }else{
-            $result=['error'=>1,'msg'=>'Your custom message'];
-        }
-        return $result;*/
+        return $orderId;
+        
     }
+    
 }

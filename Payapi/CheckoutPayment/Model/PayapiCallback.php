@@ -2,6 +2,8 @@
 namespace Payapi\CheckoutPayment\Model;
 use Payapi\CheckoutPayment\Api\PayapiCallbackInterface;
 use Payapi\CheckoutPayment\Block\JWT\JWT;
+
+use Magento\Framework\App\Filesystem\DirectoryList;
  
 class PayapiCallback implements PayapiCallbackInterface
 {
@@ -12,16 +14,20 @@ class PayapiCallback implements PayapiCallbackInterface
      */
     protected $_logger;
     protected $_helper;
+    protected $filesystem;
     /**
      * Constructor
      * @param \YourNamespace\YourModule\Logger\Logger $logger
      */
     public function __construct(
         \Payapi\CheckoutPayment\Logger\Logger $logger,
-        \Payapi\CheckoutPayment\Helper\CreateOrderHelper $helper
+        \Payapi\CheckoutPayment\Helper\CreateOrderHelper $helper,
+        \Magento\Framework\Filesystem $filesystem
     ) {
         $this->_logger = $logger;
         $this->_helper = $helper;
+        $this->filesystem = $filesystem;
+
     }
 
     /**
@@ -39,20 +45,38 @@ class PayapiCallback implements PayapiCallbackInterface
         $payload = $body_json->data;
         $this->_logger->debug($payload);         
 
-        $decoded = @JWT::decode($payload, 'qETkgXpgkhNKYeFKfxxqKhgdahcxEFc9', array('HS256'));        
-
-        $this->_logger->debug(json_encode($decoded));
+        $decoded = @JWT::decode($payload, 'qETkgXpgkhNKYeFKfxxqKhgdahcxEFc9', array('HS256')); 
+                
         $jsonData = json_decode($decoded);
+        $result = null;
         if($jsonData->payment->status == 'processing'){
+
             //Processing async payment
-            $resul = $this->_helper->createMageOrder($this->translateModel($jsonData));
-        }else if($decoded->payment->status == 'success'){
-            //Payment success
+            $order_id = $this->_helper->createMageOrder($this->translateModel($jsonData));            
+            $result = json_encode(['order_id' => $order_id]);
+            $this->writeToFile($jsonData->order->referenceId,$order_id);
+
         }else{
-            //Payment failure
+            sleep(1);
+            $orderId = $this->getOrderIdFromFile($jsonData->order->referenceId);
+            if($orderId){
+                
+                if($jsonData->payment->status == 'successful'){
+                    //Payment success
+                    $order_id = $this->_helper->addPayment($orderId);    
+                    $result = json_encode(['order_id' => $order_id]);
+                }else{
+                    //Payment failure
+                    $order_id = $this->_helper->changeStatus($orderId,"payment_review","payment_review");     
+                    $result = json_encode(['order_id' => $order_id]); 
+                }            
+            }
         }
-        $this->_logger->debug($resul);         
-        return $resul;
+        if(isset($result)){        
+            return $result;
+        }else{
+            throw new \Magento\Framework\Exception\LocalizedException(__('Could not create the order correctly.'));
+        }
     }
 
     
@@ -87,10 +111,32 @@ class PayapiCallback implements PayapiCallbackInterface
                  ],
         'items'=> $prodList
         ];
-        return $tempOrder;
-      /*  }catch(Exception $e){
-            $this->_logger->debug($e);
-        }*/        
+        return $tempOrder;   
 
+    }
+
+    protected function writeToFile($fileKey,$fileValue){
+        $directory = $this->filesystem->getDirectoryWrite(
+            DirectoryList::TMP
+        );
+        $directory->create();
+        $tmpFileName = $directory->getAbsolutePath($fileKey);
+        $file = fopen($tmpFileName, "a+"); 
+        fwrite($file, $fileValue); 
+        fclose($file); 
+    }
+
+    protected function getOrderIdFromFile($fileKey){
+        $directory = $this->filesystem->getDirectoryWrite(
+            DirectoryList::TMP
+        );
+        $directory->create();
+        $tmpFileName = $directory->getAbsolutePath($fileKey);        
+        $file = fopen($tmpFileName, "a+");         
+        $size = filesize($tmpFileName); 
+        $text = fread($file, $size);          
+        fclose($file); 
+        $directory->delete($directory->getRelativePath($tmpFileName));
+        return $text;
     }
 }

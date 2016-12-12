@@ -6,7 +6,7 @@
                 <active>1</active>
                 <title>PayApi Online Secure Payment</title>
                 <model>Payapi\CheckoutPayment\Model\SecureFormPost</model>
-                <payment_action>authorize_capture</payment_action>
+                <order_status>pending</order_status>              
                 <payapi_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />     
                 <payapi_public_id />     
             </payapi_checkoutpayment_secure_form_post>
