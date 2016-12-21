@@ -1,0 +1,49 @@
+
+<?php if($this->checkPayApiConfiguration()) { ?>
+
+  <script>
+  require(['jquery'],function($){
+
+			function doPost(evt){
+				console.log("doPost");
+      			evt.preventDefault();
+				var formData = {"qty" : "1", "productId" : '<?php echo $this->getProduct()->getId(); ?>'};
+				console.log(formData);
+				$.ajax({
+					showLoader: true,
+  					type: "POST",
+  					url: "/payapipages/index/secureformgenerator",
+  					data: formData,
+  					success: function(data){
+  						callPayapi(data);
+  					}
+				});
+      			
+      		}
+
+      		function callPayapi(payload){
+      			console.log("callpayapi");
+      			var form = document.createElement('form');
+      			form.style.display = 'none';
+      			form.setAttribute('method', 'POST');
+      			form.setAttribute('enctype', 'application/json');
+      			form.setAttribute('action', 'https://staging-input.payapi.io/v1/secureform/<?php echo $this->getPublicId();?>');      			
+
+	        	var input = document.createElement('input');
+      			input.name = 'data';
+      			input.type = 'text';
+      			input.setAttribute('value', payload);
+				form.appendChild(input);
+
+      			document.getElementsByTagName('body')[0].appendChild(form);
+      			form.submit();
+      		}
+
+      		$("#payapi-button<?php echo $this->getProduct()->getId(); ?>").click(doPost);
+
+	});
+  </script>
+  <button id="payapi-button<?php echo $this->getProduct()->getId(); ?>" class="action primary tocart payapi-button" style="margin-bottom:10px">Instant Buy</button>  
+  
+
+<?php } ?>
