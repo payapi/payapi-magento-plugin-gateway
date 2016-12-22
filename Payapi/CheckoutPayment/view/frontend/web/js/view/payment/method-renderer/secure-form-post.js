@@ -79,7 +79,7 @@ define(
                     });
                     
                     var address = quote.billingAddress();
-                    var jsonConsumer = { "email" : quote.guestEmail };
+                    var jsonConsumer = { "email" : quote.guestEmail, "mobilePhoneNumber" :  address.telephone };
                     var jsonAddress = {
                         "recipientName" : address.firstname + " " + address.lastname,               
                         "streetAddress" : address.street[0],
@@ -99,7 +99,7 @@ define(
                     };
 
                     //Callbacks
-                    var callbackUrl = "http://104.155.75.40/rest/V1/payapipages/callback";//urlBuilder.build("rest/V1/payapipages/callback");
+                    var callbackUrl = urlBuilder.build("rest/V1/payapipages/callback");
                     var jsonCallbacks = {
                         "processing" : callbackUrl,
                         "success" : callbackUrl,
@@ -118,7 +118,8 @@ define(
 
                     console.log(JSON.stringify(jsonData));
 
-                    payapiSdk.initSecureform(jsonData, 'qETkgXpgkhNKYeFKfxxqKhgdahcxEFc9', 'multimerchantshop');    
+                    payapiSdk.configure('multimerchantshop','qETkgXpgkhNKYeFKfxxqKhgdahcxEFc9');
+                    payapiSdk.postData(jsonData);    
                         }
                     );
 

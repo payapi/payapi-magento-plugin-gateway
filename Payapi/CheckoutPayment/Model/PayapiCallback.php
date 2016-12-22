@@ -79,6 +79,7 @@ class PayapiCallback implements PayapiCallbackInterface
         }
     }
 
+
     
     protected function translateModel($payapiObject){
       //  try{
@@ -93,6 +94,11 @@ class PayapiCallback implements PayapiCallbackInterface
                 array_push($prodList, ['product_id'=>$payapiObject->products[$i]->id,'qty'=>$payapiObject->products[$i]->quantity]);
             }
         }
+        if(isset($payapiObject->consumer->mobilePhoneNumber)){
+            $telephone = $payapiObject->consumer->mobilePhoneNumber;
+        }else{
+            $telephone = "0";
+        }
     $tempOrder=[
      'currency_id'  => $payapiObject->order->currency,
      'email'        => $payapiObject->consumer->email, //buyer email id
@@ -106,7 +112,7 @@ class PayapiCallback implements PayapiCallbackInterface
             'country_id' => $payapiObject->shippingAddress->countryCode,
             'region' => $payapiObject->shippingAddress->stateOrProvince,
             'postcode' => $payapiObject->shippingAddress->postalCode,
-            'telephone' => '0',
+            'telephone' => $telephone,
             'save_in_address_book' => 0
                  ],
         'items'=> $prodList

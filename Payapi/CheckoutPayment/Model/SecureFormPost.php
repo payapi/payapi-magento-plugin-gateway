@@ -27,11 +27,6 @@ class SecureFormPost extends AbstractMethod
 
     protected $_payapiApiKey = false;
     protected $_payapiPublicId = false;
-
-    protected $_countryFactory;
-    protected $_curl;
-
-    protected $_supportedCurrencyCodes = array('USD');
     
     /**
      * @var string
@@ -46,8 +41,6 @@ class SecureFormPost extends AbstractMethod
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
-        \Magento\Directory\Model\CountryFactory $countryFactory,
-        \Magento\Framework\HTTP\Client\Curl $curl,
         array $data = array()
     ) {
         parent::__construct(
@@ -62,13 +55,9 @@ class SecureFormPost extends AbstractMethod
             null,
             $data
         );
-
-        $this->_countryFactory = $countryFactory;
-        $this->_curl = $curl;
         
         $this->_payapiApiKey = $this->getConfigData('payapi_api_key');
         $this->_payapiPublicId = $this->getConfigData('payapi_public_id');
-        $this->_logger->debug("Starting class form francisco"); // log location: var/log/system.log
     }
 
 
@@ -98,10 +87,11 @@ class SecureFormPost extends AbstractMethod
      */
     public function canUseForCurrency($currencyCode)
     {
-        if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
-            $this->_logger->debug("Payapi. currency is USD");
+        /*if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
+            $this->_logger->debug("Payapi. currency  USD");
             return false;
-        }
+        }*/
+        //All currecy
         return true;
     }
 }

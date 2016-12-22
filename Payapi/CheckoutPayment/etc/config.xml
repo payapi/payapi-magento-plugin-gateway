@@ -11,5 +11,18 @@
                 <payapi_public_id />     
             </payapi_checkoutpayment_secure_form_post>
         </payment>
+
+        <carriers>
+            <oneclickshipping>
+                <active>1</active>
+                <sallowspecific>0</sallowspecific>
+                <model>Payapi\CheckoutPayment\Model\Carrier\OneClickShipping</model>
+                <name>PayApi One Click Shipping</name>
+                <price>1.00</price>
+                <title>PayApi One Click Buy shipping method</title>
+                <type>I</type>
+                <specificerrmsg>This shipping method has been created for one click payments.</specificerrmsg>
+            </oneclickshipping>
+        </carriers>
     </default>
 </config>

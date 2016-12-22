@@ -1,13 +1,50 @@
 
-<?php $secureFormData =  $this->getSecureFormData();?>;
 <div>
-<div id="secure-payment-button"></div>
+<?php if($this->checkPayApiConfiguration()) { ?>
+
   <script>
-  require(['jquery','payapiSdk'],function($){
-  		var secureFormData = <?php echo $secureFormData;?>;  	
-		payapiSdk.configure('multimerchantshop', 'qETkgXpgkhNKYeFKfxxqKhgdahcxEFc9');
-		payapiSdk.addSecurePaymentButtonToDiv(secureFormData, 'secure-payment-button', 'Buy now');
+  require(['jquery'],function($){
+  			console.log("inicio payapi 4");
+			function doPost(evt){
+				console.log("doPost");
+      			evt.preventDefault();
+				var formData = {"qty" : document.getElementById("qty").value, "productId" : '<?php echo $this->getProduct()->getId(); ?>'};
+				console.log(formData);
+				$.ajax({
+					showLoader: true,
+  					type: "POST",
+  					url: "/payapipages/index/secureformgenerator",
+  					data: formData,
+  					success: function(data){
+  						callPayapi(data);
+  					}
+				});
+      			
+      		}
+
+      		function callPayapi(payload){
+      			console.log("callpayapi");
+      			var form = document.createElement('form');
+      			form.style.display = 'none';
+      			form.setAttribute('method', 'POST');
+      			form.setAttribute('enctype', 'application/json');
+      			form.setAttribute('action', 'https://staging-input.payapi.io/v1/secureform/<?php echo $this->getPublicId();?>');      			
+
+	        	var input = document.createElement('input');
+      			input.name = 'data';
+      			input.type = 'text';
+      			input.setAttribute('value', payload);
+				form.appendChild(input);
+
+      			document.getElementsByTagName('body')[0].appendChild(form);
+      			form.submit();
+      		}
+
+      		$("#payapi-button").click(doPost);
+
 	});
   </script>
-<h3 id="log"><?php echo '2'.$secureFormData;?></h3>
+  <button id="payapi-button" class="action primary tocart">Instant Buy</button>  
+
+<?php } ?>
 </div>
