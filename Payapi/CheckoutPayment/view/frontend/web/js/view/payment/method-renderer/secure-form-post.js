@@ -27,6 +27,8 @@ define(
                 template: 'Payapi_CheckoutPayment/payment/secure-form-post',
                 
             },
+
+
             /** Redirect to paypal */
             continueToPayApi: function () {
                 if (additionalValidators.validate()) {
@@ -35,14 +37,13 @@ define(
                     setPaymentMethodAction(this.messageContainer).done(
                         function () {
                             customerData.invalidate(['cart']);
-
-                    var order = quote.totals();
+                    var order = quote.totals();                    
                     var currencyCode = order.quote_currency_code;
                     var baseExclTax = order.base_subtotal_with_discount;
                     var taxAmount = order.tax_amount;      
                     var shippingAmount = order.shipping_amount;
                     var totalOrdered = order.base_grand_total;
-                    var quoteId = quote.getQuoteId();
+                    var quoteId = window.checkoutConfig.quoteItemData[0].quote_id;
                     var shippingMethod = quote.shippingMethod();
                     var jsonOrder = {
                         "sumInCentsIncVat" : Math.round(totalOrdered*100),
@@ -53,6 +54,7 @@ define(
                     };
                     var prods = quote.getItems();
                     var jsonProducts = [];
+
                     for (var i = 0; i < prods.length; i++) {
                         var item = prods[i];
                         jsonProducts.push({
@@ -63,7 +65,8 @@ define(
                             "priceInCentsExcVat" : Math.round(item.row_total*100),
                             "vatInCents" : Math.round(item.tax_amount*100),
                             "vatPercentage" : parseFloat(item.tax_percent),
-                            "imageUrl" : item.thumbnail
+                            "imageUrl" : item.thumbnail,
+                            "extraData" : "quote="+window.checkoutConfig.quoteItemData[i].quote_id+"&item="+window.checkoutConfig.quoteItemData[i].item_id
                         });   
                     }
                     //Shipping method as item
@@ -79,7 +82,7 @@ define(
                     });
                     
                     var address = quote.billingAddress();
-                    var jsonConsumer = { "email" : quote.guestEmail, "mobilePhoneNumber" :  address.telephone };
+                    var jsonConsumer = { "email" : quote.guestEmail };//, "mobilePhoneNumber" :  address.telephone };
                     var jsonAddress = {
                         "recipientName" : address.firstname + " " + address.lastname,               
                         "streetAddress" : address.street[0],
@@ -118,7 +121,7 @@ define(
 
                     console.log(JSON.stringify(jsonData));
 
-                    payapiSdk.configure('multimerchantshop','qETkgXpgkhNKYeFKfxxqKhgdahcxEFc9');
+                    payapiSdk.configure(window.checkoutConfig.payment.customPayment.payapi_public_id, window.checkoutConfig.payment.customPayment.payapi_api_key);
                     payapiSdk.postData(jsonData);    
                         }
                     );

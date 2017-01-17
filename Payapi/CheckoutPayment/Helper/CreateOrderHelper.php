@@ -89,11 +89,19 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
         //add items in quote
+
+        $this->_customlogger->debug(json_encode($orderData));
         foreach($orderData['items'] as $item){
+            if(isset($item['extra']) && $item['extra'] != [])
+            {
+                $optsObj = new \Magento\Framework\DataObject(['qty' => $item['qty'], 'options' => $item['extra']]);            
+            }else{
+                $optsObj = new \Magento\Framework\DataObject(['qty' => $item['qty']]);            
+            }
             $product = $this->_productRepository->getById(intval($item['product_id']),false,$store->getId());
             $cart->addProduct(
                 $product,
-                intval($item['qty'])
+                $optsObj            
             );
         }
         //Set Address to quote @todo add section in order data for seperate billing and handle it
@@ -116,17 +124,24 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $cart->getPayment()->importData(['method' => 'payapi_checkoutpayment_secure_form_post']);
         // Collect total and saeve
         $cart->collectTotals();
-        // Submit the quote and create the order
+        // Submit the quote and create the order        
         $cart->save();
 
         $cart = $this->cartRepositoryInterface->get($cart->getId());
         $order_id = $this->cartManagementInterface->placeOrder($cart->getId());
         
+        $order = $this->_orderRepository->get($order_id);
+        $msg = "Payment processing event received";
+        $order->addStatusHistoryComment($msg);
+        
+        $order->save();
+
         return $order_id;
     }
 
 
     public function addPayment($orderId){
+        $this->_customlogger->debug("Adding payment to order ".$orderId);
         $order = $this->_orderRepository->get($orderId);
         if($order && $order->canInvoice()) {
             $invoice = $this->_invoiceService->prepareInvoice($order);
@@ -147,17 +162,20 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             )
             ->setIsCustomerNotified(true)
             ->save();
-            $this->changeStatus($orderId, "processing","processing");
+            $this->changeStatus($orderId, "processing","processing", "success");
+            $this->_customlogger->debug("Added payment!");
             return $orderId;
         }
         throw new \Magento\Framework\Exception\LocalizedException(__('Could not add Payment to the order.'));
     }
 
-    public function changeStatus($orderId, $state,$status){
+    public function changeStatus($orderId, $state,$status, $payapiEvent){
         $order = $this->_orderRepository->get($orderId);
 
         $order->setState($state)->setStatus($status);
- 
+        $msg = "Payment ".$payapiEvent." event received";
+        $order->addStatusHistoryComment($msg);
+        
         $order->save();
         return $orderId;
         

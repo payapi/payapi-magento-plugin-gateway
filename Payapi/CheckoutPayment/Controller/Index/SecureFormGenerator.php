@@ -1,14 +1,11 @@
 <?php
 namespace Payapi\CheckoutPayment\Controller\Index;
 
-use Payapi\CheckoutPayment\Block\JWT\JWT;
 use Magento\Framework\App\Action\Context;
 use \Magento\Catalog\Api\ProductRepositoryInterface;
 
 class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
 	protected $objectManager;
-	protected $_payapiPublicId;
-	protected $_payapiApiKey;
     protected $_logger;
 
 	public function __construct(
@@ -24,44 +21,14 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
 	public function execute() {
         $this->_logger->debug("Execute SecureFormGenerator");
     	$result = $this->resultJsonFactory->create();
-    	if ($this->getRequest()->isAjax()) {
-
-            $this->_logger->debug("Instant buy");              
-
-        	$productId = $this->getRequest()->getPostValue('productId');
-        	$qty = $this->getRequest()->getPostValue('qty',1);
-            $this->_logger->debug($productId. " ---- ".$qty);
-        	$secureformObject = $this->getEncodedSecureFormData($productId, $qty);
-        	$this->_logger->debug($secureformObject);
-        	return $result->setData($secureformObject);        	
-    	}
     }
 
 	
-	protected function getEncodedSecureFormData($productId, $qty = 1){
-		
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-    	$paymentHelper =  $objectManager->get('\Magento\Payment\Helper\Data');
-        $paymentMethod = $paymentHelper->getMethodInstance("payapi_checkoutpayment_secure_form_post");
 
-        $this->_payapiApiKey = $paymentMethod->getConfigData('payapi_api_key');
-        $this->_payapiPublicId = $paymentMethod->getConfigData('payapi_public_id');
-        
-
-        $sfobject = $this->getSecureFormData($productId, $qty);
-		$encoded =  JWT :: encode( $sfobject , $this->_payapiApiKey, 'HS512' ) ;
-    	
-    	return $encoded;    	
-	}
-
-	public function getPublicId(){
-		return $this->_payapiPublicId;
-	}
-
-	protected function getSecureFormData($productId, $qty = 1){
-        $this->_logger->debug("Params: ".$productId."--".$qty);
+	public function getSecureFormData($productId, $opts = ['qty' => 1], $ipaddress = ""){
+        $this->_logger->debug("Params: ".$productId."--".json_encode($opts)."--".$ipaddress);
 		$om = \Magento\Framework\App\ObjectManager::getInstance();
-
+        
 		$_productloader = $om->get('\Magento\Catalog\Model\ProductFactory');
         $this->_logger->debug("Loading product ".$productId);
         $_product = $_productloader->create()->load($productId);
@@ -74,15 +41,19 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
 		//Customer login
 		$customerSession = $om->get('Magento\Customer\Model\Session');
 		$customer = null;
+        $resolver = $this->_objectManager->get('Magento\Framework\Locale\Resolver');
+        $locale = $resolver->getLocale();
 		if($customerSession->isLoggedIn()) {
    			// customer login action
   			$customer =  $customerSession->getCustomer();
   			$address = $om->create('Magento\Customer\Model\Address')->load($customer->getDefaultBilling());
-  			$consumer = array("email" => $customer->getEmail());
+  			$consumer = array("locale" => $locale, "email" => $customer->getEmail());//, "mobilePhoneNumber" => "");
 			if($address != null){
 				$streetArr = $address->getStreet();
 				$street1 = $streetArr[0];
 				$street2 = (count($streetArr) > 1) ? $streetArr[1] : "";			
+                
+                $consumer = array("locale" => $locale, "email" => $customer->getEmail());//, "mobilePhoneNumber" => $address->getTelephone());
 
 				$shippingAddress = array("recipientName" => $customer->getName(),      			
       				"streetAddress" => $street1,
@@ -95,12 +66,12 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
 	  			$shippingAddress = array("recipientName" => $customer->getName());
 			}
 		}else{
-	  		$consumer = array("email" => "");
+	  		$consumer = array("locale" => $locale, "email" => "");//, "mobilePhoneNumber" => "");
 	  		$shippingAddress = array();
 		}
 
 		//Calculations	
-		$quoteTmp = $this->getQuote($store, $_product, $customer, $qty);
+		$quoteTmp = $this->getQuote($store, $_product, $customer, $opts, $ipaddress);
 
 		$totals = $quoteTmp->getShippingAddress()->getData();
 
@@ -114,19 +85,20 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
     		"sumInCentsExcVat" => round(($baseExclTax + $shippingAmount)*100),
     		"vatInCents" => round($taxAmount*100),
     		"currency" => $currencyCode,
-    		"referenceId" => "oneclick".$this->getRandomId());
+    		"referenceId" => $quoteTmp->getId());
 		
 		$items = $quoteTmp->getAllItems();
 		$products = array();
 		if($items){
 			foreach($items as $item) {		
+                $qty = ((isset($opts['qty']))? intval($opts['qty']) : 1);
 				array_push($products,array(
 					"id" => $item->getProductId(),
-    				"quantity" => $item->getQty(),
+    				"quantity" => $qty,
     				"title" => $item->getName(),
-    				"priceInCentsIncVat" => round($item['row_total_incl_tax']*100),
-    				"priceInCentsExcVat" => round($item['row_total']*100),
-    				"vatInCents" => round($item['tax_amount']*100),
+    				"priceInCentsIncVat" => round($item['row_total_incl_tax']*100/$qty),
+    				"priceInCentsExcVat" => round($item['row_total']*100/$qty),
+    				"vatInCents" => round($item['tax_amount']*100/$qty),
     				"vatPercentage" => $item['tax_percent'],
     				"imageUrl" => $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA).'catalog/product'.$_product->getImage()
   			));
@@ -167,13 +139,15 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
                         "chargeback" => $callbackUrl
                     );
 
-		return array("order" => $order, "products" => $products, "consumer" => $consumer, "shippingAddress" => $shippingAddress, "returnUrls" => $returnUrls, "callbacks" => $jsonCallbacks);
+		$res = array("order" => $order, "products" => $products, "consumer" => $consumer, "shippingAddress" => $shippingAddress, "returnUrls" => $returnUrls, "callbacks" => $jsonCallbacks);
+        $this->_logger->debug(json_encode($res));
+        return $res;
 		
 	}
 
 
 
-	protected function getQuote($store, $product, $customer = null, $qty = 1){
+	protected function getQuote($store, $product, $customer = null, $opts = ['qty' => 1], $ipaddress = ""){
 		
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $this->objectManager = $objectManager;
@@ -202,7 +176,8 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
         }
 
         if($tmpShipp == null){
-        	$tmpShipp = $this->getShippingFromIp();
+        	$tmpShipp = $this->getShippingFromIp($ipaddress);
+            $this->_logger->debug(json_encode($tmpShipp));
         	if(!isset($tmpShipp) || $tmpShipp == null){
         		$scopeConfig = $objectManager->get('\Magento\Framework\App\Config\ScopeConfigInterface');
         		$countryCode = $scopeConfig->getValue('general/store_information/country_id');
@@ -220,14 +195,16 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
             'save_in_address_book' => 0
         	];
         	}
+            $this->_logger->debug(json_encode($tmpShipp));
         }
         //add items in quote
-        
+            $optsObj = new \Magento\Framework\DataObject($opts);
             $cart->addProduct(
                 $product,
-                $qty
+                $optsObj
             );
-        
+            
+
         //Set Address to quote @todo add section in order data for seperate billing and handle it
         $cart->getBillingAddress()->addData($tmpShipp);
         $cart->getShippingAddress()->addData($tmpShipp);
@@ -256,17 +233,30 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
 		return $val;
 	}
 
-	protected function getShippingFromIp() {		
-        $visitorIp = $this->getVisitorIp();
+	protected function getShippingFromIp($ip) {		
+        if(!$ip || $ip == ""){
+            $visitorIp = $this->getVisitorIp();
+        }else{
+            $visitorIp = $ip;
+        }
+
+        $this->_logger->debug($visitorIp);
         $url = "https://input.payapi.io/v1/api/fraud/ipdata/".$visitorIp;
         $curl = $this->objectManager->get('\Magento\Framework\HTTP\Client\Curl');
         $curl->get($url);
         $response = json_decode($curl->getBody(), true);
+        $this->_logger->debug(json_encode($response));
         $countryCode = null;
+        $regionCode = '';
         if($response && isset($response['countryCode'])){
         	$countryCode = $response['countryCode'];
-        	$regionCode = $response['regionCode'];
-        	$postalCode = $response['postalCode'];
+        	if(isset($response['regionCode'])) 
+                $regionCode = $response['regionCode'];
+            else $regionCode = "";
+        	if(isset($response['postalCode'])) 
+                $postalCode = $response['postalCode'];
+            else $postalCode = "";
+            $this->_logger->debug($countryCode);
         }
         if($countryCode != null){
        		return [
@@ -282,13 +272,29 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
             'save_in_address_book' => 0
         	];        
         }else{
+            $this->_logger->debug("returns null getShippingFromIp");
         	return null;
         }
     }
 
-    protected function getVisitorIp() {       
-        $remoteAddress = $this->objectManager->create('Magento\Framework\HTTP\PhpEnvironment\RemoteAddress');
-        return $remoteAddress->getRemoteAddress();
+    protected function getVisitorIp() {  
+    
+        $ipaddress = '';
+        if (getenv('HTTP_CLIENT_IP'))
+            $ipaddress = getenv('HTTP_CLIENT_IP');
+        else if(getenv('HTTP_X_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+        else if(getenv('HTTP_X_FORWARDED'))
+            $ipaddress = getenv('HTTP_X_FORWARDED');
+        else if(getenv('HTTP_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_FORWARDED_FOR');
+        else if(getenv('HTTP_FORWARDED'))
+            $ipaddress = getenv('HTTP_FORWARDED');
+        else if(getenv('REMOTE_ADDR'))
+            $ipaddress = getenv('REMOTE_ADDR');        
+
+        $this->_logger->debug("visitor Ip: ".$ipaddress);
+        return $ipaddress;
     }
 }
 ?>

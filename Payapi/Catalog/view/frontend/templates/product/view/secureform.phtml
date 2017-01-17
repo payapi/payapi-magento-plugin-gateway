@@ -2,49 +2,85 @@
 <div>
 <?php if($this->checkPayApiConfiguration()) { ?>
 
-  <script>
-  require(['jquery'],function($){
+  <script>  
+  var _payapi = {
+    checkMandatory: function _checkMandatory(url,silencePopup){
+        var $toCartForm = $("#product_addtocart_form");
+        var isValid = $toCartForm.validation('isValid');
+        if(!isValid){
+            if(!silencePopup){
+              alert("Please fil in all of the required files");
+            }
+          return '';
+        }
+        //Add product options to the currUrl
+        var opts = decodeURIComponent($toCartForm.find(":input:not(:hidden)").serialize());
+        
+        var productUrl = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
+        if(url.indexOf("payapiwebshop=1") > 0){
+          productUrl = 'https://staging-input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
+        }
+        
+        if(silencePopup)
+          return productUrl;
+        window.location = productUrl;
+    }
+  };
+
+  require(['jquery',
+    //'mage/mage'
+    ],function($){
   			console.log("inicio payapi 4");
-			function doPost(evt){
-				console.log("doPost");
-      			evt.preventDefault();
-				var formData = {"qty" : document.getElementById("qty").value, "productId" : '<?php echo $this->getProduct()->getId(); ?>'};
-				console.log(formData);
-				$.ajax({
-					showLoader: true,
-  					type: "POST",
-  					url: "/payapipages/index/secureformgenerator",
-  					data: formData,
-  					success: function(data){
-  						callPayapi(data);
-  					}
-				});
-      			
-      		}
 
-      		function callPayapi(payload){
-      			console.log("callpayapi");
-      			var form = document.createElement('form');
-      			form.style.display = 'none';
-      			form.setAttribute('method', 'POST');
-      			form.setAttribute('enctype', 'application/json');
-      			form.setAttribute('action', 'https://staging-input.payapi.io/v1/secureform/<?php echo $this->getPublicId();?>');      			
+        var currUrl = window.location.href;
+        $("meta[name='product.meta.data']").attr("content", currUrl);
 
-	        	var input = document.createElement('input');
-      			input.name = 'data';
-      			input.type = 'text';
-      			input.setAttribute('value', payload);
-				form.appendChild(input);
+      		var $btnClicked = $("#payapi-button");
+          $btnClicked.click(function(evt){
+            evt.preventDefault();
+            _payapi.checkMandatory(currUrl,false);
+          });
 
-      			document.getElementsByTagName('body')[0].appendChild(form);
-      			form.submit();
-      		}
+        var $toCartForm = $("#product_addtocart_form");
+        $toCartForm.change(function(){
 
-      		$("#payapi-button").click(doPost);
+          var currUrl = window.location.href;                  
+          var opts = decodeURIComponent($toCartForm.find(":input:not(:hidden)").serialize());
+          currUrl = currUrl+"&"+opts;
+          $("meta[name='product.meta.data']").attr("content", currUrl);
+        });
 
 	});
   </script>
+<?php if($this->getSecureFormData() && count($this->getSecureFormData()->products) > 1){ ?>
+<meta name="io.payapi.webshop" content="<?php echo $this->getPublicId(); ?>">
+<meta name="order.currency" content="<?php echo $this->getSecureFormData()->order->currency; ?>">
+<meta name="order.shippingHandlingFeeInCentsExcVat" content="<?php echo $this->getSecureFormData()->products[1]->priceInCentsExcVat; ?>">
+<meta name="order.shippingHandlingFeeInCentsIncVat" content="<?php echo $this->getSecureFormData()->products[1]->priceInCentsIncVat; ?>">
+<meta name="product.id" content="<?php echo $this->getSecureFormData()->products[0]->id; ?>">
+<meta name="product.quantity" content="<?php echo $this->getSecureFormData()->products[0]->quantity; ?>">
+<meta name="product.title" content="<?php echo $this->getSecureFormData()->products[0]->title; ?>">
+<meta name="product.imageUrl" content="<?php echo $this->getSecureFormData()->products[0]->imageUrl; ?>">
+<meta name="product.priceInCentsIncVat" content="<?php echo $this->getSecureFormData()->products[0]->priceInCentsIncVat; ?>">
+<meta name="product.priceInCentsExcVat" content="<?php echo $this->getSecureFormData()->products[0]->priceInCentsExcVat; ?>">
+<meta name="product.vatInCents" content="<?php echo $this->getSecureFormData()->products[0]->vatInCents; ?>">
+<meta name="product.vatPercentage" content="<?php echo $this->getSecureFormData()->products[0]->vatPercentage; ?>">
+<meta name="product.hasMandatoryFields" content="<?php echo $this->checkMandatoryFields(); ?>">
+<meta name="consumer.email" content="<?php echo $this->getSecureFormData()->consumer->email; ?>">
+<!--<meta name="consumer.mobilePhoneNumber" content="<?php //echo $this->getSecureFormData()->consumer->mobilePhoneNumber; ?>"> -->
+<meta name="consumer.locale" content="<?php echo $this->getSecureFormData()->consumer->locale; ?>">
+<meta name="callbacks.processing" content="<?php echo $this->getSecureFormData()->callbacks->processing; ?>">
+<meta name="callbacks.success" content="<?php echo $this->getSecureFormData()->callbacks->success; ?>">
+<meta name="callbacks.failed" content="<?php echo $this->getSecureFormData()->callbacks->failed; ?>">
+<meta name="callbacks.chargeback" content="<?php echo $this->getSecureFormData()->callbacks->chargeback; ?>">
+<meta name="returnUrls.success" content="<?php echo $this->getSecureFormData()->returnUrls->success; ?>">
+<meta name="returnUrls.cancel" content="<?php echo $this->getSecureFormData()->returnUrls->cancel; ?>">
+<meta name="returnUrls.failed" content="<?php echo $this->getSecureFormData()->returnUrls->failed; ?>">
+<?php } ?>
+<meta name="product.extraData" content="<?php echo $this->getExtraData(); ?>">
+<meta name="product.meta.data" content="">
   <button id="payapi-button" class="action primary tocart">Instant Buy</button>  
 
 <?php } ?>
+
 </div>

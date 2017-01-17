@@ -1,5 +1,15 @@
 <?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
 <body>
+	<referenceContainer name="page.wrapper" htmlClass="fngrsharesdk-container fngrsharesdk-productpage">
+        <block class="Payapi\Catalog\Block\Product\View\ProductListing"
+            name="product.view.fngrsharesdk"
+            template="Payapi_Catalog::product/view/test.phtml"
+            after="-">
+        </block>
+    </referenceContainer>
+    
     <referenceContainer name="product.info.addtocart">
         <block class="Payapi\Catalog\Block\Product\View\Secureform"
             name="product.view.secureform"
@@ -7,4 +17,12 @@
             after="-">
         </block>
     </referenceContainer>
+    <referenceContainer name="product.info.addtocart.additional">
+        <block class="Payapi\Catalog\Block\Product\View\Secureform"
+            name="product.view.secureformadditional"
+            template="Payapi_Catalog::product/view/secureform.phtml"
+            after="-">
+        </block>
+    </referenceContainer>
 </body>
+</page>

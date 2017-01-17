@@ -1,0 +1,26 @@
+<div class="test">
+
+<?php if($this->checkPayApiConfiguration()) { ?>
+<script type="text/javascript">
+	require(['jquery'],function($){
+		require(['fngrtouch','fngrui','fngrsdk'],function(){
+			$("a.product-item-photo").each(function(){
+				$(this).addClass("fngrsharesdk-product");
+				var href = $(this).attr('href');
+				if(href && href.indexOf("payapiwebshop") < 0 ){
+					if (href.indexOf("?") >= 0 ){
+						href = href	+ '&payapiwebshop=1&ip=<?php echo $this->getVisitorIp(); ?>';
+					}else{
+						href = href	+ '?payapiwebshop=1&ip=<?php echo $this->getVisitorIp(); ?>';
+					}
+
+					href = href	+ '&hasMandatory=' + $(this).parent().find('button.payapi-button').attr('data-mandatory');
+					
+					$(this).attr('href', href);
+				}
+			});
+		});
+  	});
+</script>
+<?php } ?>
+</div>
