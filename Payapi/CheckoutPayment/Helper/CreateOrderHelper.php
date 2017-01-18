@@ -8,6 +8,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_productRepository;
     protected $_orderFactory;
     protected $_invoiceSender;
+    protected $_quoteRepository;
      /**
     * @param Magento\Framework\App\Helper\Context $context
     * @param Magento\Store\Model\StoreManagerInterface $storeManager
@@ -33,7 +34,8 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Payapi\CheckoutPayment\Logger\Logger $customlogger,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
-        \Magento\Framework\DB\Transaction $transaction,
+        \Magento\Framework\DB\Transaction $transaction,        
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,  
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender
     ) {
         $this->_storeManager = $storeManager;
@@ -51,6 +53,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_orderRepository = $orderRepository;
         $this->_invoiceService = $invoiceService;
         $this->_transaction = $transaction;
+        $this->_quoteRepository = $quoteRepository;
         $this->_invoiceSender = $invoiceSender;
         parent::__construct($context);
     }
@@ -179,6 +182,111 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $order->save();
         return $orderId;
         
+    }
+
+    //NEWWWW
+
+    //NEW
+    protected function getShippingAddress($payapiObject){
+        if(isset($payapiObject->consumer->mobilePhoneNumber)){
+            $telephone = $payapiObject->consumer->mobilePhoneNumber;
+        }else{
+            $telephone = "0";
+        }
+        return [
+            'firstname'    => $payapiObject->shippingAddress->recipientName, //address Details
+            'lastname'     => '.',
+            'street' => $payapiObject->shippingAddress->streetAddress,
+            'street2' => $payapiObject->shippingAddress->streetAddress2,
+            'city' => $payapiObject->shippingAddress->city,
+            'country_id' => $payapiObject->shippingAddress->countryCode,
+            'region' => $payapiObject->shippingAddress->stateOrProvince,
+            'postcode' => $payapiObject->shippingAddress->postalCode,
+            'telephone' => $telephone,
+            'save_in_address_book' => 0
+                 ];
+    }
+    public function createOrder($payapiObject){
+        $extra = $payapiObject->products[0]->extraData;
+        if(strpos($extra, 'quote=') !== false){
+            //WEBSHOP/INSTANT BUY
+            $quoteId = intval(substr($extra, 6));    
+            $this->quote = $this->_quoteRepository->get($quoteId); 
+            $this->saveOrder($this->quote,$payapiObject->consumer->email,$this->getShippingAddress($payapiObject));
+
+            //Update shipping address
+        }else{
+            //POST
+            $quoteId = $payapiObject->order->referenceId;            
+            $this->quote = $this->_quoteRepository->get($quoteId); 
+            $this->saveOrder($this->quote, $payapiObject->consumer->email);
+        }
+
+        
+        
+    }
+
+    public function saveOrder($cart, $email, $shippingAddress = false){
+        //Set Address to quote @todo add section in order data for seperate billing and handle it
+        $store=$this->_storeManager->getStore();
+        $websiteId = $this->_storeManager->getStore()->getWebsiteId();
+        $customer=$this->customerFactory->create();
+        $customer->setWebsiteId($websiteId);
+        $customer->loadByEmail($email);// load customet by email address
+        
+        
+            $cart->setStore($store);
+            $cart->setCurrency();
+            // if you have already buyer id then you can load customer directly
+           // $cart->setCurrency();
+            $this->_customlogger->debug('Count:.....'.$cart->getItemsCount());
+        if($customer->getEntityId()){            
+            $customer= $this->customerRepository->getById($customer->getEntityId());
+            $cart->assignCustomer($customer); //Assign quote to customer
+        }else{           
+            $cart->setCustomerIsGuest(true);
+        }
+        $cart->setCustomerEmail($email);
+
+        if($shippingAddress){
+            $cart->getBillingAddress()->addData($shippingAddress);
+            $cart->getShippingAddress()->addData($shippingAddress);
+            $this->shippingRate
+            ->setCode('oneclickshipping_oneclickshipping')
+            ->getPrice(1);
+        $shippingAddress = $cart->getShippingAddress();
+        //@todo set in order data
+        $shippingAddress->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->setShippingMethod('oneclickshipping_oneclickshipping'); //shipping method
+        //$cart->getShippingAddress()->addShippingRate($this->rate);
+        $cart->setPaymentMethod('payapi_checkoutpayment_secure_form_post'); //payment method
+        //@todo insert a variable to affect the invetory
+        $cart->setInventoryProcessed(false);
+        // Set sales order payment
+        $cart->getPayment()->importData(['method' => 'payapi_checkoutpayment_secure_form_post']);
+        
+        }
+
+
+
+       
+        $cart->collectTotals();
+        // Submit the quote and create the order        
+        $cart->save();
+
+        $cart = $this->cartRepositoryInterface->get($cart->getId());
+        $order_id = $this->cartManagementInterface->placeOrder($cart->getId());
+        
+        $cart->setOrigOrderId($order_id);
+        $cart->save();
+
+        $order = $this->_orderRepository->get($order_id);
+        $msg = "Payment processing event received";
+        $order->addStatusHistoryComment($msg);
+        
+        $order->save();
+        return $order_id;
     }
     
 }

@@ -25,10 +25,10 @@ class PayapiCallback implements PayapiCallbackInterface
      */
     public function __construct(
         \Payapi\CheckoutPayment\Logger\Logger $logger,
-        \Payapi\CheckoutPayment\Helper\CreateOrderHelper $helper,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,    
+        \Payapi\CheckoutPayment\Helper\CreateOrderHelper $helper,  
         \Magento\Framework\Filesystem $filesystem,
-        \Magento\Payment\Helper\Data $paymentHelper
+        \Magento\Payment\Helper\Data $paymentHelper,
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     ) {
 
         $this->_logger = $logger;
@@ -60,13 +60,14 @@ class PayapiCallback implements PayapiCallbackInterface
         $result = null;
         if($jsonData->payment->status == 'processing'){
             //Processing async payment
-            $order_id = $this->_helper->createMageOrder($this->translateModel($jsonData));            
+            //$order_id = $this->_helper->createMageOrder($this->translateModel($jsonData));            
+            $order_id = $this->_helper->createOrder($jsonData);
             $result = json_encode(['order_id' => $order_id]);
-            $this->writeToFile($jsonData->order->referenceId,$order_id);
+            //$this->writeToFile($jsonData->order->referenceId,$order_id);
 
         }else{
             sleep(1);
-            $orderId = $this->getOrderIdFromFile($jsonData->order->referenceId);
+            $orderId = $this->getOrderId($jsonData);//$this->getOrderIdFromFile($jsonData->order->referenceId);
             if($orderId){
                 
                 if($jsonData->payment->status == 'successful'){
@@ -175,6 +176,20 @@ class PayapiCallback implements PayapiCallbackInterface
         return $res;
     }
 
+    protected function getOrderId($payapiObject){
+        $extra = $payapiObject->products[0]->extraData;
+        if(strpos($extra, 'quote=') !== false){
+            //WEBSHOP/INSTANT BUY
+            $quoteId = intval(substr($extra, 6));               
+        }else{
+            //POST
+            $quoteId = $payapiObject->order->referenceId;    
+        }
+        $this->quote = $this->_quoteRepository->get($quoteId); 
+        $this->_logger->debug("Quote: ".$quoteId." --- order: ".$this->quote->getOrigOrderId());
+        return $this->quote->getOrigOrderId();
+    }
+
     protected function writeToFile($fileKey,$fileValue){
         $directory = $this->filesystem->getDirectoryWrite(
             DirectoryList::TMP
@@ -199,4 +214,5 @@ class PayapiCallback implements PayapiCallbackInterface
         $directory->delete($directory->getRelativePath($tmpFileName));
         return $text;
     }
+
 }

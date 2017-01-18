@@ -221,7 +221,7 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
         $cart->setInventoryProcessed(false);
         $cart->getPayment()->importData(['method' => 'payapi_checkoutpayment_secure_form_post']);
         $quoteTmp = $cart->collectTotals();
-
+        $cart->save();
         return $quoteTmp;        
 	}
 
