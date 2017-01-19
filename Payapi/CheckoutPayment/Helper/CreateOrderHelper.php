@@ -207,19 +207,25 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
                  ];
     }
     public function createOrder($payapiObject){
+        $this->_customlogger->debug("START CREATE ORDER: ".json_encode($payapiObject));
         $extra = $payapiObject->products[0]->extraData;
+        $this->_customlogger->debug("START CREATE ORDER2: ".$extra);
         if(strpos($extra, 'quote=') !== false){
             //WEBSHOP/INSTANT BUY
             $quoteId = intval(substr($extra, 6));    
+            $this->_customlogger->debug("WEBSHOP QUOTEID: ".$quoteId);
             $this->quote = $this->_quoteRepository->get($quoteId); 
-            $this->saveOrder($this->quote,$payapiObject->consumer->email,$this->getShippingAddress($payapiObject));
+            $this->_customlogger->debug("WEBSHOP QUOTEID2: ".$quoteId. ($this->quote != null));
+            return $this->saveOrder($this->quote,$payapiObject->consumer->email,$this->getShippingAddress($payapiObject));
 
             //Update shipping address
         }else{
             //POST
-            $quoteId = $payapiObject->order->referenceId;            
+            $quoteId = intval($payapiObject->order->referenceId);          
+            $this->_customlogger->debug("POST QUOTEID: ".$quoteId);
             $this->quote = $this->_quoteRepository->get($quoteId); 
-            $this->saveOrder($this->quote, $payapiObject->consumer->email);
+            $this->_customlogger->debug("POST QUOTEID2: ".$quoteId. ($this->quote != null));
+            return $this->saveOrder($this->quote, $payapiObject->consumer->email);
         }
 
         
@@ -228,6 +234,8 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function saveOrder($cart, $email, $shippingAddress = false){
         //Set Address to quote @todo add section in order data for seperate billing and handle it
+
+        $this->_customlogger->debug("INIT SAVEORDER");
         $store=$this->_storeManager->getStore();
         $websiteId = $this->_storeManager->getStore()->getWebsiteId();
         $customer=$this->customerFactory->create();
@@ -249,6 +257,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $cart->setCustomerEmail($email);
 
         if($shippingAddress){
+            $this->_customlogger->debug("ADDING SHIPPHING: ".json_encode($shippingAddress));
             $cart->getBillingAddress()->addData($shippingAddress);
             $cart->getShippingAddress()->addData($shippingAddress);
             $this->shippingRate
@@ -270,23 +279,26 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
 
 
-       
+       $this->_customlogger->debug("BEFORE COLLECT TOTALS");
         $cart->collectTotals();
         // Submit the quote and create the order        
+        $this->_customlogger->debug("BEFORE SAVING");
         $cart->save();
-
+        $this->_customlogger->debug("SAVED");
         $cart = $this->cartRepositoryInterface->get($cart->getId());
         $order_id = $this->cartManagementInterface->placeOrder($cart->getId());
         
         $cart->setOrigOrderId($order_id);
         $cart->save();
-
+        $this->_customlogger->debug("SAVED CART WITH ORDER ID");
         $order = $this->_orderRepository->get($order_id);
         $msg = "Payment processing event received";
         $order->addStatusHistoryComment($msg);
+        $this->_customlogger->debug("COMMENT ADDED");
         
         $order->save();
-        return $order_id;
+        $this->_customlogger->debug("ORDER SAVED");
+        return $order->getId();
     }
     
 }

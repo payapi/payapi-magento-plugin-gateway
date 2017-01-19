@@ -66,7 +66,7 @@ define(
                             "vatInCents" : Math.round(item.tax_amount*100),
                             "vatPercentage" : parseFloat(item.tax_percent),
                             "imageUrl" : item.thumbnail,
-                            "extraData" : "quote="+window.checkoutConfig.quoteItemData[i].quote_id+"&item="+window.checkoutConfig.quoteItemData[i].item_id
+                            "extraData" : "item="+window.checkoutConfig.quoteItemData[i].item_id
                         });   
                     }
                     //Shipping method as item
