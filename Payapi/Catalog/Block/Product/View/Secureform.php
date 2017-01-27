@@ -31,7 +31,7 @@ class Secureform extends AbstractProduct
         if(count($opts) > 0){
             $param['options'] = $opts;
         }
-        $this->_secureformData = $objectManager->get('Payapi\CheckoutPayment\Controller\Index\SecureFormGenerator')->getSecureFormData($this->getProduct()->getId(), $param, $this->_visitorIp );
+        $this->_secureformData = $objectManager->get('Payapi\CheckoutPayment\Controller\Index\SecureFormGenerator')->getInstantBuySecureForm($this->getProduct()->getId(), $param, $this->_visitorIp );
   
         return isset($this->_payapiPublicId) && isset($this->_payapiApiKey);        
     }

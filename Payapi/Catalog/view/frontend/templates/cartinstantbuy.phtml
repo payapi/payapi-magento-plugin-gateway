@@ -1,0 +1,31 @@
+
+<div>
+
+<?php if($this->checkPayApiConfiguration()) { ?>
+<script>
+require(['jquery', 
+        'payapiSdk'],function($){
+ 	
+    var $btnClicked = $("#payapi-instantbutton");
+	$btnClicked.click(function(evt){
+        evt.preventDefault();
+        var jsonData = {
+            "referenceQuoteId": window.checkoutConfig.quoteItemData[0].quote_id,
+            "ipaddress":"<?php echo $this->getVisitorIp();?>"
+        };
+        $.ajax({
+            showLoader: true,
+            type: "POST",
+            url: "/payapipages/index/secureformgenerator",
+            data: jsonData,
+            success: function(data){
+                payapiSdk.configure(window.checkoutConfig.payment.customPayment.payapi_public_id, window.checkoutConfig.payment.customPayment.payapi_api_key);
+                payapiSdk.postData(data);
+            }
+        });    
+    });			
+});
+</script>
+  <button id="payapi-instantbutton" class="action primary checkout"><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>  
+  <?php } ?>
+</div>

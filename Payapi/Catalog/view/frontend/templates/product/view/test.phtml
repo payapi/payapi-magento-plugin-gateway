@@ -2,7 +2,7 @@
 
 <?php if($this->checkPayApiConfiguration()) { ?>
 <script type="text/javascript">
-	require(['jquery'],function($){
+	require(['jquery','payapiSdk'],function($){
 		require(['fngrtouch','fngrui','fngrsdk'],function(){
 			$("a.product-item-photo").each(function(){
 				$(this).addClass("fngrsharesdk-product");
@@ -19,6 +19,29 @@
 					$(this).attr('href', href);
 				}
 			});
+
+			
+			window.setTimeout(function(){
+        		$("#top-cart-btn-checkout").after("<button class='action primary checkout' style='margin-top:10px' id='payapi-mini-instantbuy'><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>");
+        		var $btnClicked = $("#payapi-mini-instantbuy");
+				$btnClicked.click(function(evt){
+			        evt.preventDefault();
+			        var jsonData = {
+			            "ipaddress":"<?php echo $this->getVisitorIp();?>"
+			        };
+			        $.ajax({
+			            showLoader: true,
+			            type: "POST",
+			            url: "/payapipages/index/secureformgenerator",
+			            data: jsonData,
+			            success: function(data){
+			                payapiSdk.configure("<?php echo $this->getPublicId()?>", "<?php echo $this->getApiKey()?>");
+			                payapiSdk.postData(data);
+			            }
+			        });    
+			    });	
+
+    		},5000);
 		});
   	});
 </script>

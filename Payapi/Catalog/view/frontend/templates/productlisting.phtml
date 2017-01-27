@@ -19,6 +19,6 @@
 
   </script>
 
-  <button data-mandatory="<?php echo $this->checkMandatoryFields(); ?>" id="payapi-button<?php echo $this->getProduct()->getId(); ?>" class="action primary tocart payapi-button" style="margin-bottom:10px">Instant Buy</button>  
+  <button data-mandatory="<?php echo $this->checkMandatoryFields(); ?>" id="payapi-button<?php echo $this->getProduct()->getId(); ?>" class="action primary tocart payapi-button" style="margin-bottom:10px"><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>  
   
 <?php } ?>

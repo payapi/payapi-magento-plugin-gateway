@@ -4,12 +4,12 @@
 
   <script>  
   var _payapi = {
-    checkMandatory: function _checkMandatory(url,silencePopup){
+    checkMandatory: function _checkMandatory(url,silencePopup,msg){
         var $toCartForm = $("#product_addtocart_form");
         var isValid = $toCartForm.validation('isValid');
         if(!isValid){
             if(!silencePopup){
-              alert("Please fil in all of the required files");
+              alert(msg);
             }
           return '';
         }
@@ -27,10 +27,9 @@
     }
   };
 
-  require(['jquery',
-    //'mage/mage'
-    ],function($){
+  require(['jquery','mage/translate'],function($){
   			console.log("inicio payapi 4");
+        var msg = $.mage.__("Please fill in all of the required fields");
 
         var currUrl = window.location.href;
         $("meta[name='product.meta.data']").attr("content", currUrl);
@@ -38,7 +37,7 @@
       		var $btnClicked = $("#payapi-button");
           $btnClicked.click(function(evt){
             evt.preventDefault();
-            _payapi.checkMandatory(currUrl,false);
+            _payapi.checkMandatory(currUrl,false,msg);
           });
 
         var $toCartForm = $("#product_addtocart_form");
@@ -79,7 +78,7 @@
 <?php } ?>
 <meta name="product.extraData" content="<?php echo $this->getExtraData(); ?>">
 <meta name="product.meta.data" content="">
-  <button id="payapi-button" class="action primary tocart">Instant Buy</button>  
+  <button id="payapi-button" class="action primary tocart"><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>  
 
 <?php } ?>
 

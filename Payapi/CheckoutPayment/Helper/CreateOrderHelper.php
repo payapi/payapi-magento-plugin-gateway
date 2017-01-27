@@ -5,10 +5,10 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
 
     protected $_customlogger;
-    protected $_productRepository;
     protected $_orderFactory;
     protected $_invoiceSender;
     protected $_quoteRepository;
+    protected $_stockItemRepository;
      /**
     * @param Magento\Framework\App\Helper\Context $context
     * @param Magento\Store\Model\StoreManagerInterface $storeManager
@@ -16,132 +16,38 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     * @param Magento\Framework\Data\Form\FormKey $formKey $formkey,
     * @param Magento\Quote\Model\Quote $quote,
     * @param Magento\Customer\Model\CustomerFactory $customerFactory,
-    * @param Magento\Sales\Model\Service\OrderService $orderService,
     */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Catalog\Model\ProductFactory $productFactory,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Sales\Model\Service\OrderService $orderService,
-        \Magento\Sales\Model\OrderFactory $orderFactory,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepositoryInterface,
         \Magento\Quote\Api\CartManagementInterface $cartManagementInterface,
-        \Magento\Quote\Model\Quote\Address\Rate $shippingRate,
         \Payapi\CheckoutPayment\Logger\Logger $customlogger,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Framework\DB\Transaction $transaction,        
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,  
-        \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender
+        \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
+        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository
     ) {
         $this->_storeManager = $storeManager;
-        $this->_productFactory = $productFactory;
         $this->quoteManagement = $quoteManagement;
         $this->customerFactory = $customerFactory;
         $this->customerRepository = $customerRepository;
-        $this->orderService = $orderService;
         $this->cartRepositoryInterface = $cartRepositoryInterface;
         $this->cartManagementInterface = $cartManagementInterface;
-        $this->shippingRate = $shippingRate;
         $this->_customlogger = $customlogger;
-        $this->_productRepository = $productRepository;
-        $this->_orderFactory = $orderFactory;
         $this->_orderRepository = $orderRepository;
         $this->_invoiceService = $invoiceService;
         $this->_transaction = $transaction;
         $this->_quoteRepository = $quoteRepository;
         $this->_invoiceSender = $invoiceSender;
+        $this->_stockItemRepository = $stockItemRepository;
         parent::__construct($context);
     }
-
-    /**
-     * Create Order On Your Store
-     * 
-     * @param array $orderData
-     * @return array
-     * 
-    */
-    public function createMageOrder($orderData) {
-        $store=$this->_storeManager->getStore();
-        $websiteId = $this->_storeManager->getStore()->getWebsiteId();
-        $customer=$this->customerFactory->create();
-        $customer->setWebsiteId($websiteId);
-        $customer->loadByEmail($orderData['email']);// load customet by email address
-        
-        
-         //init the quote
-            $cart_id = $this->cartManagementInterface->createEmptyCart();
-            $cart = $this->cartRepositoryInterface->get($cart_id);
-            $cart->setStore($store);
-
-            // if you have already buyer id then you can load customer directly
-            $cart->setCurrency();
-
-        if($customer->getEntityId()){            
-            $customer= $this->customerRepository->getById($customer->getEntityId());
-            $cart->assignCustomer($customer); //Assign quote to customer
-        }else{           
-            $cart->setCustomerIsGuest(true);
-        }
-        $cart->setCustomerEmail($orderData['email']);
-
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
-        //add items in quote
-
-        $this->_customlogger->debug(json_encode($orderData));
-        foreach($orderData['items'] as $item){
-            if(isset($item['extra']) && $item['extra'] != [])
-            {
-                $optsObj = new \Magento\Framework\DataObject(['qty' => $item['qty'], 'options' => $item['extra']]);            
-            }else{
-                $optsObj = new \Magento\Framework\DataObject(['qty' => $item['qty']]);            
-            }
-            $product = $this->_productRepository->getById(intval($item['product_id']),false,$store->getId());
-            $cart->addProduct(
-                $product,
-                $optsObj            
-            );
-        }
-        //Set Address to quote @todo add section in order data for seperate billing and handle it
-        $cart->getBillingAddress()->addData($orderData['shipping_address']);
-        $cart->getShippingAddress()->addData($orderData['shipping_address']);
-        // Collect Rates and Set Shipping & Payment Method
-        $this->shippingRate
-            ->setCode($orderData['shipping_method'])
-            ->getPrice(1);
-        $shippingAddress = $cart->getShippingAddress();
-        //@todo set in order data
-        $shippingAddress->setCollectShippingRates(true)
-            ->collectShippingRates()
-            ->setShippingMethod($orderData['shipping_method']); //shipping method
-        //$cart->getShippingAddress()->addShippingRate($this->rate);
-        $cart->setPaymentMethod('payapi_checkoutpayment_secure_form_post'); //payment method
-        //@todo insert a variable to affect the invetory
-        $cart->setInventoryProcessed(false);
-        // Set sales order payment
-        $cart->getPayment()->importData(['method' => 'payapi_checkoutpayment_secure_form_post']);
-        // Collect total and saeve
-        $cart->collectTotals();
-        // Submit the quote and create the order        
-        $cart->save();
-
-        $cart = $this->cartRepositoryInterface->get($cart->getId());
-        $order_id = $this->cartManagementInterface->placeOrder($cart->getId());
-        
-        $order = $this->_orderRepository->get($order_id);
-        $msg = "Payment processing event received";
-        $order->addStatusHistoryComment($msg);
-        
-        $order->save();
-
-        return $order_id;
-    }
-
 
     public function addPayment($orderId){
         $this->_customlogger->debug("Adding payment to order ".$orderId);
@@ -158,14 +64,18 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $transactionSave->save();
             $this->_invoiceSender->send($invoice);
             //send notification code
+            if($order->getState() !== "holded"){
+                $this->changeStatus($orderId, "processing","processing", "success");
+            }else{
+                $msg = __("Payment %1 event received. ","success");
+                $order->addStatusHistoryComment($msg);
+            }
 
-            $order->setState("processing")->setStatus("processing");
             $order->addStatusHistoryComment(
                 __('Notified customer about invoice #%1.', $invoice->getId())
             )
             ->setIsCustomerNotified(true)
             ->save();
-            $this->changeStatus($orderId, "processing","processing", "success");
             $this->_customlogger->debug("Added payment!");
             return $orderId;
         }
@@ -176,7 +86,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $order = $this->_orderRepository->get($orderId);
 
         $order->setState($state)->setStatus($status);
-        $msg = "Payment ".$payapiEvent." event received";
+        $msg = __("Payment %1 event received. ",$payapiEvent);
         $order->addStatusHistoryComment($msg);
         
         $order->save();
@@ -184,9 +94,6 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         
     }
 
-    //NEWWWW
-
-    //NEW
     protected function getShippingAddress($payapiObject){
         if(isset($payapiObject->consumer->mobilePhoneNumber)){
             $telephone = $payapiObject->consumer->mobilePhoneNumber;
@@ -206,35 +113,41 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             'save_in_address_book' => 0
                  ];
     }
+    
     public function createOrder($payapiObject){
+
         $this->_customlogger->debug("START CREATE ORDER: ".json_encode($payapiObject));
         $extra = $payapiObject->products[0]->extraData;
         $this->_customlogger->debug("START CREATE ORDER2: ".$extra);
-        if(strpos($extra, 'quote=') !== false){
+        $merchantComment = "";
+            if(isset($payapiObject->extraInputData) && isset($payapiObject->extraInputData->messageToMerchant)){
+                $merchantComment = $payapiObject->extraInputData->messageToMerchant;
+            }
+        parse_str($extra, $extrasArr);
+        if(isset($extrasArr['quote'])){
             //WEBSHOP/INSTANT BUY
-            $quoteId = intval(substr($extra, 6));    
+            $quoteId = intval($extrasArr['quote']);    
             $this->_customlogger->debug("WEBSHOP QUOTEID: ".$quoteId);
             $this->quote = $this->_quoteRepository->get($quoteId); 
-            $this->_customlogger->debug("WEBSHOP QUOTEID2: ".$quoteId. ($this->quote != null));
-            return $this->saveOrder($this->quote,$payapiObject->consumer->email,$this->getShippingAddress($payapiObject));
+            $this->stockChanges = $this->checkStock($this->quote->getAllItems());
+            return $this->saveOrder($this->quote,$payapiObject->consumer->email,$this->getShippingAddress($payapiObject), $merchantComment);
 
             //Update shipping address
         }else{
             //POST
             $quoteId = intval($payapiObject->order->referenceId);          
             $this->_customlogger->debug("POST QUOTEID: ".$quoteId);
-            $this->quote = $this->_quoteRepository->get($quoteId); 
-            $this->_customlogger->debug("POST QUOTEID2: ".$quoteId. ($this->quote != null));
-            return $this->saveOrder($this->quote, $payapiObject->consumer->email);
+            $this->quote = $this->_quoteRepository->get($quoteId);  
+            $this->stockChanges = $this->checkStock($this->quote->getAllItems());
+            
+            return $this->saveOrder($this->quote, $payapiObject->consumer->email, false, $merchantComment);
         }
-
-        
         
     }
 
-    public function saveOrder($cart, $email, $shippingAddress = false){
+    public function saveOrder($cart, $email, $shippingAddress = false, $messageToMerchant = ""){
         //Set Address to quote @todo add section in order data for seperate billing and handle it
-
+       
         $this->_customlogger->debug("INIT SAVEORDER");
         $store=$this->_storeManager->getStore();
         $websiteId = $this->_storeManager->getStore()->getWebsiteId();
@@ -245,9 +158,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         
             $cart->setStore($store);
             $cart->setCurrency();
-            // if you have already buyer id then you can load customer directly
-           // $cart->setCurrency();
-            $this->_customlogger->debug('Count:.....'.$cart->getItemsCount());
+
         if($customer->getEntityId()){            
             $customer= $this->customerRepository->getById($customer->getEntityId());
             $cart->assignCustomer($customer); //Assign quote to customer
@@ -260,45 +171,69 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $this->_customlogger->debug("ADDING SHIPPHING: ".json_encode($shippingAddress));
             $cart->getBillingAddress()->addData($shippingAddress);
             $cart->getShippingAddress()->addData($shippingAddress);
-            $this->shippingRate
-            ->setCode('oneclickshipping_oneclickshipping')
-            ->getPrice(1);
-        $shippingAddress = $cart->getShippingAddress();
-        //@todo set in order data
-        $shippingAddress->setCollectShippingRates(true)
-            ->collectShippingRates()
-            ->setShippingMethod('oneclickshipping_oneclickshipping'); //shipping method
-        //$cart->getShippingAddress()->addShippingRate($this->rate);
-        $cart->setPaymentMethod('payapi_checkoutpayment_secure_form_post'); //payment method
-        //@todo insert a variable to affect the invetory
-        $cart->setInventoryProcessed(false);
-        // Set sales order payment
-        $cart->getPayment()->importData(['method' => 'payapi_checkoutpayment_secure_form_post']);
-        
         }
 
-
-
-       $this->_customlogger->debug("BEFORE COLLECT TOTALS");
-        $cart->collectTotals();
+       // $cart->collectTotals();
         // Submit the quote and create the order        
-        $this->_customlogger->debug("BEFORE SAVING");
         $cart->save();
-        $this->_customlogger->debug("SAVED");
+
+
+
+        
         $cart = $this->cartRepositoryInterface->get($cart->getId());
+        $stockObj = $this->_stockItemRepository->get($cart->getAllItems()[0]->getProductId());
+        $this->_customlogger->debug("final stock ".$stockObj->getQty()."Is processed inv: ".$cart->getInventoryProcessed());
+
+
         $order_id = $this->cartManagementInterface->placeOrder($cart->getId());
+        
         
         $cart->setOrigOrderId($order_id);
         $cart->save();
-        $this->_customlogger->debug("SAVED CART WITH ORDER ID");
+        $this->_customlogger->debug("SAVED QUOTE WITH ORDER ID");
         $order = $this->_orderRepository->get($order_id);
-        $msg = "Payment processing event received";
-        $order->addStatusHistoryComment($msg);
-        $this->_customlogger->debug("COMMENT ADDED");
+        $msg = __("Payment %1 event received. ","processing");
         
+        if($messageToMerchant && $messageToMerchant != ""){
+            $msg = $msg. "Client msg: ".$messageToMerchant;
+        }
+
+        $order->addStatusHistoryComment($msg);
+        if(count($this->stockChanges) > 0){
+            $order->setState("holded")->setStatus("holded");
+            foreach ($this->stockChanges as $stockMsg) {
+                $order->addStatusHistoryComment('!! '.$stockMsg);
+            }
+        }
+
         $order->save();
         $this->_customlogger->debug("ORDER SAVED");
-        return $order->getId();
+        return $order_id;
     }
+
+
+    protected function checkStock($items){
+        $result = [];
+        $i=0;
+        foreach($items as $item){
+            $i = $i+1;
+            $stockObj = $this->_stockItemRepository->get($item->getProductId());
+            if($stockObj && $item->getQty() > $stockObj->getQty()){
+                //No enough stock. Increment
+                $original = $stockObj->getQty();
+                $newQty = $item->getQty();
+
+                $item->getProduct()->setStockData(['qty' => $newQty, 'is_in_stock' => $newQty]);
+                $item->getProduct()->setQuantityAndStockStatus(['qty' => $newQty, 'is_in_stock' => $newQty]);
+                $item->getProduct()->save();
+
+                $this->_customlogger->debug("SAVED STOCK FOR ".$item->getProductId().":  ".$newQty);
+                $result[] = __('Order item at line # %1 has a stock conflict. Original Qty in stock: # %2; Requested Qty: # %3',$i,$original,$newQty);
+            }
+        }
+
+        return $result;
+    }
+
     
 }

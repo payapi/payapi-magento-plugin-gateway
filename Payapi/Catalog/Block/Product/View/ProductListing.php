@@ -23,6 +23,10 @@ class ProductListing extends \Magento\Framework\View\Element\Template {
         return $this->_payapiPublicId;
     }   
 
+    public function getApiKey(){
+        return $this->_payapiApiKey;
+    }   
+
     public function getVisitorIp() {  
     
         $ipaddress = '';

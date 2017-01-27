@@ -3,7 +3,6 @@ namespace Payapi\CheckoutPayment\Model;
 use Payapi\CheckoutPayment\Api\PayapiCallbackInterface;
 use Payapi\CheckoutPayment\Block\JWT\JWT;
 
-use Magento\Framework\App\Filesystem\DirectoryList;
  
 class PayapiCallback implements PayapiCallbackInterface
 {
@@ -14,7 +13,6 @@ class PayapiCallback implements PayapiCallbackInterface
      */
     protected $_logger;
     protected $_helper;
-    protected $filesystem;
     protected $_payapiApiKey;
     protected $_quoteRepository;
     protected $quote = false;
@@ -26,14 +24,12 @@ class PayapiCallback implements PayapiCallbackInterface
     public function __construct(
         \Payapi\CheckoutPayment\Logger\Logger $logger,
         \Payapi\CheckoutPayment\Helper\CreateOrderHelper $helper,  
-        \Magento\Framework\Filesystem $filesystem,
         \Magento\Payment\Helper\Data $paymentHelper,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     ) {
 
         $this->_logger = $logger;
         $this->_helper = $helper;
-        $this->filesystem = $filesystem;
         $this->_quoteRepository = $quoteRepository;
         $paymentMethod = $paymentHelper->getMethodInstance("payapi_checkoutpayment_secure_form_post");
 
@@ -60,14 +56,11 @@ class PayapiCallback implements PayapiCallbackInterface
         $result = null;
         if($jsonData->payment->status == 'processing'){
             //Processing async payment
-            //$order_id = $this->_helper->createMageOrder($this->translateModel($jsonData));            
             $order_id = $this->_helper->createOrder($jsonData);
             $result = json_encode(['order_id' => $order_id]);
-            //$this->writeToFile($jsonData->order->referenceId,$order_id);
-
+            
         }else{
-            sleep(1);
-            $orderId = $this->getOrderId($jsonData);//$this->getOrderIdFromFile($jsonData->order->referenceId);
+            $orderId = $this->getOrderId($jsonData);
             if($orderId){
                 
                 if($jsonData->payment->status == 'successful'){
@@ -76,12 +69,15 @@ class PayapiCallback implements PayapiCallbackInterface
                     $result = json_encode(['order_id' => $order_id]);
                 }else if($jsonData->payment->status == 'failed'){
                     //Payment failure
+                    //restore stock
                     $order_id = $this->_helper->changeStatus($orderId,"canceled","canceled", "failed");     
                     $result = json_encode(['order_id' => $order_id]); 
                 }else if($jsonData->payment->status == 'chargeback'){            
                     $order_id = $this->_helper->changeStatus($orderId,"payment_review","payment_review", "chargeback");     
                     $result = json_encode(['order_id' => $order_id]); 
                 }else{
+                    //Payment cancelled
+                    //restore stock
                     $order_id = $this->_helper->changeStatus($orderId,"payment_review","payment_review", $jsonData->payment->status);     
                     $result = json_encode(['order_id' => $order_id]); 
                 }
@@ -94,125 +90,15 @@ class PayapiCallback implements PayapiCallbackInterface
         }
     }
 
-
-    
-    protected function translateModel($payapiObject){
-      //  try{
-        $this->_logger->debug(json_encode($payapiObject));
-        $prodList = array();
-        $len = count($payapiObject->products);
-        $shippingMethod = "";
-        for ($i=0; $i < $len; $i++){            
-            if($i == $len-1 && $len > 1){
-                $shippingMethod = $payapiObject->products[$i]->id;
-            }else{
-                $extra = [];
-                if(isset($payapiObject->products[$i]->extraData) && $payapiObject->products[$i]->extraData!= ""){
-                    if($payapiObject->products[$i]->extraData.indexOf("quote=") > 0
-                        && $payapiObject->products[$i]->extraData.indexOf("item=") > 0){
-                        $extra = null;
-                    }else{
-                        $extra = parse_str($payapiObject->products[$i]->extraData);                        
-                    }
-                }
-                if(!$extra){
-                    $extra = $this->generateOptionsFrom(parse_str($payapiObject->products[$i]->extraData), $i);
-                }
-
-                array_push($prodList, ['product_id'=>$payapiObject->products[$i]->id,'qty'=>$payapiObject->products[$i]->quantity, 'extra' => $extra]);
-            }
-        }
-        if($shippingMethod == "" || $shippingMethod == "shipping_and_handling"){
-            $shippingMethod = "oneclickshipping_oneclickshipping";
-        }
-
-        if(isset($payapiObject->consumer->mobilePhoneNumber)){
-            $telephone = $payapiObject->consumer->mobilePhoneNumber;
-        }else{
-            $telephone = "0";
-        }
-    $tempOrder=[
-     'currency_id'  => $payapiObject->order->currency,
-     'email'        => $payapiObject->consumer->email, //buyer email id
-     'shipping_method' => $shippingMethod,
-     'shipping_address' =>[
-            'firstname'    => $payapiObject->shippingAddress->recipientName, //address Details
-            'lastname'     => '.',
-            'street' => $payapiObject->shippingAddress->streetAddress,
-            'street2' => $payapiObject->shippingAddress->streetAddress2,
-            'city' => $payapiObject->shippingAddress->city,
-            'country_id' => $payapiObject->shippingAddress->countryCode,
-            'region' => $payapiObject->shippingAddress->stateOrProvince,
-            'postcode' => $payapiObject->shippingAddress->postalCode,
-            'telephone' => $telephone,
-            'save_in_address_book' => 0
-                 ],
-        'items'=> $prodList
-        ];
-        return $tempOrder;   
-
-    }
-
-    protected function generateOptionsFrom($extraArr,$i){
-        //value: label: 
-
-        $this->_logger->debug("Generate options: ". json_encode($extraArr));
-        $quoteId = 1865; //$extraArr['quote'];
-        $itemId = 1178 + $i;//$extraArr['item'];
-        if(!$this->quote){
-            $this->_logger->debug("loading quote");
-            $this->quote = $this->_quoteRepository->get($quoteId);     
-
-        }
-        $item = $this->quote->getItemById($itemId);
-       
-        $res = [];
-        foreach($item->getOptions() as $opt){
-           $this->_logger->debug(json_encode($opt));
-           $res[$opt->getId()] = json_encode($item->getBuyRequest());
-        }
-        
-        $this->_logger->debug(json_encode($res));
-        return $res;
-    }
-
     protected function getOrderId($payapiObject){
-        $extra = $payapiObject->products[0]->extraData;
-        if(strpos($extra, 'quote=') !== false){
-            //WEBSHOP/INSTANT BUY
-            $quoteId = intval(substr($extra, 6));               
+        parse_str($payapiObject->products[0]->extraData, $outParams);
+        if(isset($outParams['quote'])){
+            $quoteId = intval($outParams['quote']);
         }else{
-            //POST
-            $quoteId = $payapiObject->order->referenceId;    
+            $quoteId = intval($payapiObject->order->referenceId);
         }
-        $this->quote = $this->_quoteRepository->get($quoteId); 
-        $this->_logger->debug("Quote: ".$quoteId." --- order: ".$this->quote->getOrigOrderId());
-        return $this->quote->getOrigOrderId();
-    }
 
-    protected function writeToFile($fileKey,$fileValue){
-        $directory = $this->filesystem->getDirectoryWrite(
-            DirectoryList::TMP
-        );
-        $directory->create();
-        $tmpFileName = $directory->getAbsolutePath($fileKey);
-        $file = fopen($tmpFileName, "w+"); 
-        fwrite($file, $fileValue); 
-        fclose($file); 
+        $quote = $this->_quoteRepository->get($quoteId);
+        return $quote->getOrigOrderId();
     }
-
-    protected function getOrderIdFromFile($fileKey){
-        $directory = $this->filesystem->getDirectoryWrite(
-            DirectoryList::TMP
-        );
-        $directory->create();
-        $tmpFileName = $directory->getAbsolutePath($fileKey);        
-        $file = fopen($tmpFileName, "a+");         
-        $size = filesize($tmpFileName); 
-        $text = fread($file, $size);          
-        fclose($file); 
-        $directory->delete($directory->getRelativePath($tmpFileName));
-        return $text;
-    }
-
 }
