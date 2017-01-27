@@ -1,0 +1,31 @@
+"PayApi Online Secure Payment","PayApi, pagos seguros online",module,Payapi_CheckoutPayment
+"<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Click here to sign up for a PayApi account</a>","<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Pulse aqui para registrarse y obtener una cuenta PayApi</a>",module,Payapi_CheckoutPayment
+"Enabled","Activado",module,Payapi_CheckoutPayment
+"PayApi Public Id","PayApi Public Id",module,Payapi_CheckoutPayment
+"PayApi Api Key","PayApi Api Key",module,Payapi_CheckoutPayment
+"Debug","Depuración",module,Payapi_CheckoutPayment
+"Payment from Applicable Countries","Pago desde paises aplicables",module,Payapi_CheckoutPayment
+"Payment from Specific Countries","Pago desde paises específicos",module,Payapi_CheckoutPayment
+"Sort Order","Orden de clasificación",module,Payapi_CheckoutPayment
+"Handling and delivery","Envío y manipulación",module,Payapi_CheckoutPayment
+"Could not create the order correctly.","No se pudo crear el pedido con éxito",module,Payapi_CheckoutPayment
+"Continue Shopping","Continuar con la compra",module,Payapi_CheckoutPayment
+"Default shipping method for Instant Buy","Método de envío por defecto para la Compra al instante",module,Payapi_CheckoutPayment
+"Thank you, your payment is being processed!","Gracias ¡Su pago está siendo procesado!",module,Payapi_CheckoutPayment
+"A confirmation email has been sent to you, we will contact you as soon as posible.","Se le ha enviado un email de confirmación, contactaremos con usted lo antes posible.",module,Payapi_CheckoutPayment
+"Sorry, you cancelled the payment","Sentimos que haya cancelado el pago",module,Payapi_CheckoutPayment
+"Your products are still on your shopping cart, if you do need any help do not hesitate to contact us.","Sus productos están en su carrito de la compra, si necesita cualquier ayuda no dude en contactar con nosotros.",module,Payapi_CheckoutPayment
+"Sorry, your payment has failed","Lo sentimos, su pago no ha podido efectuarse",module,Payapi_CheckoutPayment
+"If you need further assistance do not hesitate to contact us.","Si necesita cualquier ayuda no dude en contactar con nosotros.",module,Payapi_CheckoutPayment
+"Oops... Something went wrong","Oops... Algo ha ido mal",module,Payapi_CheckoutPayment
+"Please try again or contact us for further help.","Por favor, contacte con nuestro servicio de soporte.",module,Payapi_CheckoutPayment
+"processing","en proceso",module,Payapi_CheckoutPayment
+"success","con éxito",module,Payapi_CheckoutPayment
+"failed","fallido",module,Payapi_CheckoutPayment
+"Payment %1 event received","Evento de pago %1 recibido",module,Payapi_CheckoutPayment
+"Notified customer about invoice #%1","Notificación al cliente de la factura #%1",module,Payapi_CheckoutPayment
+"Please fill in all of the required fields","Por favor, rellene todos los campos obligatorios",module,Payapi_CheckoutPayment
+"Processing payment","Pago procesado",module,Payapi_CheckoutPayment
+"Payment cancelled","Payment cancelado",module,Payapi_CheckoutPayment
+"Payment failed","Payment erróneo",module,Payapi_CheckoutPayment
+"Order item at line # %1 has a stock conflict. Original Qty in stock: # %2; Requested Qty: # %3","Hay una diferencia de stock en la línea de pedido # %1. Cantidad disponible en Stock: # %2; Cantidad solicitada: # %3",module,Payapi_CheckoutPayment

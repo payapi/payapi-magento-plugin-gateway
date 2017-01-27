@@ -1,6 +1,6 @@
 <div class="checkout-success">
-    <p>Sorry, you have canceled the payment.</p>
-    <p>Your products are still on your shopping cart, if you do need any help do not hesitate to contact us.</p>
+    <p><?php /* @escapeNotVerified */ echo __('Sorry, you cancelled the payment') ?></p>
+    <p><?php /* @escapeNotVerified */ echo __('Your products are still on your shopping cart, if you do need any help do not hesitate to contact us.') ?></p>
     <div class="actions-toolbar">
         <div class="primary">
             <a class="action primary continue" href="<?php /* @escapeNotVerified */ echo $block->getUrl() ?>"><span><?php /* @escapeNotVerified */ echo __('Continue Shopping') ?></span></a>

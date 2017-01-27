@@ -1,0 +1,32 @@
+"PayApi Online Secure Payment","PayApi Online Secure Payment",module,Payapi_CheckoutPayment
+"<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Click here to sign up for a PayApi account</a>","<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Click here to sign up for a PayApi account</a>",module,Payapi_CheckoutPayment
+"ClickPayApi","Pulse aqui para registrarse y obtener una cuenta PayApi",module,Payapi_CheckoutPayment
+"Enabled","Enabled",module,Payapi_CheckoutPayment
+"PayApi Public Id","PayApi Public Id",module,Payapi_CheckoutPayment
+"PayApi Api Key","PayApi Api Key",module,Payapi_CheckoutPayment
+"Debug","Debug",module,Payapi_CheckoutPayment
+"Payment from Applicable Countries","Payment from Applicable Countries",module,Payapi_CheckoutPayment
+"Payment from Specific Countries","Payment from Specific Countries",module,Payapi_CheckoutPayment
+"Sort Order","Sort Order",module,Payapi_CheckoutPayment
+"Handling and Delivery","Handling and Delivery",module,Payapi_CheckoutPayment
+"Could not create the order correctly.","Could not create the order correctly.",module,Payapi_CheckoutPayment
+"Continue Shopping","Continue Shopping",module,Payapi_CheckoutPayment
+"Default shipping method for Instant Buy","Default shipping method for Instant Buy",module,Payapi_CheckoutPayment
+"Thank you, your payment is being processed!","Thank you, your payment is being processed!",module,Payapi_CheckoutPayment
+"A confirmation email has been sent to you, we will contact you as soon as posible.","A confirmation email has been sent to you, we will contact you as soon as posible.",module,Payapi_CheckoutPayment
+"Sorry, you cancelled the payment","Sorry, you cancelled the payment",module,Payapi_CheckoutPayment
+"Your products are still on your shopping cart, if you do need any help do not hesitate to contact us.","Your products are still on your shopping cart, if you do need any help do not hesitate to contact us.",module,Payapi_CheckoutPayment
+"Sorry, your payment has failed","Sorry, your payment has failed",module,Payapi_CheckoutPayment
+"If you need further assistance do not hesitate to contact us.","If you need further assistance do not hesitate to contact us.",module,Payapi_CheckoutPayment
+"Oops... Something went wrong","Oops... Something went wrong",module,Payapi_CheckoutPayment
+"Please try again or contact us for further help.","Please try again or contact us for further help.",module,Payapi_CheckoutPayment
+"processing","processing",module,Payapi_CheckoutPayment
+"success","success",module,Payapi_CheckoutPayment
+"failed","failed",module,Payapi_CheckoutPayment
+"Payment %1 event received","Payment %1 event received",module,Payapi_CheckoutPayment
+"Notified customer about invoice #%1","Notified customer about invoice #%1",module,Payapi_CheckoutPayment
+"Please fill in all of the required fields","Please fill in all of the required fields",module,Payapi_CheckoutPayment
+"Processing payment","Processing payment",module,Payapi_CheckoutPayment
+"Payment cancelled","Payment cancelled",module,Payapi_CheckoutPayment
+"Payment failed","Payment failed",module,Payapi_CheckoutPayment
+"Order item at line # %1 has a stock conflict. Original Qty in stock: # %2; Requested Qty: # %3","Order item at line # %1 has a stock conflict. Original Qty in stock: # %2; Requested Qty: # %3",module,Payapi_CheckoutPayment

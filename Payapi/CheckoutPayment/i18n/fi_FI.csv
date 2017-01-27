@@ -1,0 +1,31 @@
+"PayApi Online Secure Payment","PayApi Online Maksupalvelu",module,Payapi_CheckoutPayment
+"<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Click here to sign up for a PayApi account</a>","<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Klikkaa tästä rekisteröidäksesi PayApi tunnuksen</a>",module,Payapi_CheckoutPayment
+"Enabled","Päällä",module,Payapi_CheckoutPayment
+"PayApi Public Id","PayApi Public ID",module,Payapi_CheckoutPayment
+"PayApi Api Key","PayApi API Key",module,Payapi_CheckoutPayment
+"Debug","Debug",module,Payapi_CheckoutPayment
+"Payment from Applicable Countries","Maksut maista",module,Payapi_CheckoutPayment
+"Payment from Specific Countries","Maksut vain näistä maista",module,Payapi_CheckoutPayment
+"Sort Order","Järjestys",module,Payapi_CheckoutPayment
+"Handling and delivery","Käsittely ja toimitus",module,Payapi_CheckoutPayment
+"Could not create the order correctly.","Tilausta ei pystytty luomaan oikein.",module,Payapi_CheckoutPayment
+"Continue Shopping","Jatka shoppailua",module,Payapi_CheckoutPayment
+"Default shipping method for Instant Buy","Oletus toimitustapa Osta heti -toiminnolle",module,Payapi_CheckoutPayment
+"Thank you, your payment is being processed!","Kiitoksia! Maksusi on käsittelyssä.",module,Payapi_CheckoutPayment
+"A confirmation email has been sent to you, we will contact you as soon as posible.","Vahvistus sähkoposti on lähetetty sinulle. Saat ilmoituksen kun maksu on hyvaksytty.",module,Payapi_CheckoutPayment
+"Sorry, you cancelled the payment","Pahoittelumme! Peruutit tilauksen",module,Payapi_CheckoutPayment
+"Your products are still on your shopping cart, if you do need any help do not hesitate to contact us.","Peruutit tilauksen, mutta voit jatkaa ostoksia ja tehda uusia tilauksia haluamallasi tavalla. Jos tarvitset apua, ole hyva ja ota meihin yhteytta.",module,Payapi_CheckoutPayment
+"Sorry, your payment has failed","Pahoittelumme! Maksu ei onnistunut",module,Payapi_CheckoutPayment
+"If you need further assistance do not hesitate to contact us.","Maksu ei onnistunut. Jos tarvitset apua, otathan meihin yhteytta niin autamme.",module,Payapi_CheckoutPayment
+"Oops... Something went wrong","Oops... Jotain meni pieleen.",module,Payapi_CheckoutPayment
+"Please try again or contact us for further help.","Ole hyva ja yrita myohemmin uudelleen tai ota meihin yhteytta jos ongelma toistuu.",module,Payapi_CheckoutPayment
+"processing","processing",module,Payapi_CheckoutPayment
+"success","success",module,Payapi_CheckoutPayment
+"failed","failed",module,Payapi_CheckoutPayment
+"Payment %1 event received","Maksu %1 tapahtuma vastaanotettu",module,Payapi_CheckoutPayment
+"Notified customer about invoice #%1","Asiakasta informoitu laskusta #%1",module,Payapi_CheckoutPayment
+"Please fill in all of the required fields","Ole hyvä ja täytä pakolliset kentät",module,Payapi_CheckoutPayment
+"Processing payment","Maksu on käsittelyssä",module,Payapi_CheckoutPayment
+"Payment cancelled","Maksu ei onnistunut",module,Payapi_CheckoutPayment
+"Payment failed","Maksu hylätty",module,Payapi_CheckoutPayment
+"Order item at line # %1 has a stock conflict. Original Qty in stock: # %2; Requested Qty: # %3","Tilauksen rivillä # %1 on varastosaldon konflikti! Alkuperäinen varastosaldo: # %2; Tilattu määrä: # %3",module,Payapi_CheckoutPayment
