@@ -5,7 +5,7 @@
  */
 namespace Payapi\CheckoutPayment\Model\Config;
 
-class AllActiveMethods extends \Magento\Shipping\Model\Config\Source\Allmethods
+class AllActiveShippingMethods extends \Magento\Shipping\Model\Config\Source\Allmethods
 {
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig

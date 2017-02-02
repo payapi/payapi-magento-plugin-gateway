@@ -10,7 +10,7 @@
 "Handling and delivery","Envío y manipulación",module,Payapi_CheckoutPayment
 "Could not create the order correctly.","No se pudo crear el pedido con éxito",module,Payapi_CheckoutPayment
 "Continue Shopping","Continuar con la compra",module,Payapi_CheckoutPayment
-"Default shipping method for Instant Buy","Método de envío por defecto para la Compra al instante",module,Payapi_CheckoutPayment
+"Default shipping method for Instant Buy","Método de envío por defecto para la funcionalidad \"Compra ahora\"",module,Payapi_CheckoutPayment
 "Thank you, your payment is being processed!","Gracias ¡Su pago está siendo procesado!",module,Payapi_CheckoutPayment
 "A confirmation email has been sent to you, we will contact you as soon as posible.","Se le ha enviado un email de confirmación, contactaremos con usted lo antes posible.",module,Payapi_CheckoutPayment
 "Sorry, you cancelled the payment","Sentimos que haya cancelado el pago",module,Payapi_CheckoutPayment

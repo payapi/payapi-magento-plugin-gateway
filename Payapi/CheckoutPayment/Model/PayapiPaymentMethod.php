@@ -1,17 +1,12 @@
 <?php
 /**
- * Payapi
- *
- * @category Payapi
- * @package Payapi_CheckoutPayment
- * @author Francisco Nieto <francisco@payapi.io>
- * @license http://choosealicense.com/licenses/mit/ MIT License
+ * Payapi Payment Method
  */
 namespace Payapi\CheckoutPayment\Model;
 
 use Magento\Payment\Model\Method\AbstractMethod;
 
-class SecureFormPost extends AbstractMethod
+class PayapiPaymentMethod extends AbstractMethod
 {
     const CODE = 'payapi_checkoutpayment_secure_form_post';
 

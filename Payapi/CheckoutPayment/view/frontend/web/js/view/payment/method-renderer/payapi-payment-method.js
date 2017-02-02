@@ -24,7 +24,7 @@ define(
 
         return Component.extend({
             defaults: {
-                template: 'Payapi_CheckoutPayment/payment/secure-form-post',
+                template: 'Payapi_CheckoutPayment/payment/payapi-payment-method',
                 
             },
 

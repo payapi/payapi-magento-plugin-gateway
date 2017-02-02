@@ -1,11 +1,12 @@
 <?php
 
-namespace Payapi\Catalog\Block\Product\View;
+namespace Payapi\Catalog\Block;
 
-class ProductListing extends \Magento\Framework\View\Element\Template {
+class InstantBuyBlock extends \Magento\Framework\View\Element\Template {
 	
 	protected $_payapiPublicId;
 	protected $_payapiApiKey;
+    protected $_instantBuyDefaultShipping;
     protected $_objectManager;
 
     public function checkPayApiConfiguration(){
@@ -15,8 +16,9 @@ class ProductListing extends \Magento\Framework\View\Element\Template {
 
         $this->_payapiApiKey = $paymentMethod->getConfigData('payapi_api_key');
         $this->_payapiPublicId = $paymentMethod->getConfigData('payapi_public_id');
+        $this->_instantBuyDefaultShipping = $paymentMethod->getConfigData('instantbuy_shipping_method');
         $this->_objectManager = $objectManager;
-        return isset($this->_payapiPublicId) && isset($this->_payapiApiKey);
+        return isset($this->_payapiPublicId) && isset($this->_payapiApiKey) && isset($this->_instantBuyDefaultShipping) && is_string($this->_instantBuyDefaultShipping) && strlen($this->_instantBuyDefaultShipping) > 0;
     }
 
     public function getPublicId(){
@@ -27,11 +29,11 @@ class ProductListing extends \Magento\Framework\View\Element\Template {
         return $this->_payapiApiKey;
     }   
 
-    public function getVisitorIp() {  
+    public function getVisitorIp($checkParams = true) {  
     
         $ipaddress = '';
         
-        if(isset($_GET['ip'])){
+        if($checkParams && isset($_GET['ip'])){
             return $_GET['ip'];
         }
         if (getenv('HTTP_CLIENT_IP'))

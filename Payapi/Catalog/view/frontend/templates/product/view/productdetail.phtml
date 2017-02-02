@@ -19,8 +19,10 @@
         var productUrl = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
         if(url.indexOf("payapiwebshop=1") > 0){
           productUrl = 'https://staging-input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
+        }else if(url.indexOf("payapiwebshop=0") > 0){
+          productUrl = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
         }
-        
+
         if(silencePopup)
           return productUrl;
         window.location = productUrl;
@@ -52,7 +54,7 @@
 	});
   </script>
 <?php if($this->getSecureFormData() && count($this->getSecureFormData()->products) > 1){ ?>
-<meta name="io.payapi.webshop" content="<?php echo $this->getPublicId(); ?>">
+<meta name="io.payapi.webshop" content="<?php echo $this->getInstantBuyBlock()->getPublicId(); ?>">
 <meta name="order.currency" content="<?php echo $this->getSecureFormData()->order->currency; ?>">
 <meta name="order.shippingHandlingFeeInCentsExcVat" content="<?php echo $this->getSecureFormData()->products[1]->priceInCentsExcVat; ?>">
 <meta name="order.shippingHandlingFeeInCentsIncVat" content="<?php echo $this->getSecureFormData()->products[1]->priceInCentsIncVat; ?>">
@@ -78,8 +80,9 @@
 <?php } ?>
 <meta name="product.extraData" content="<?php echo $this->getExtraData(); ?>">
 <meta name="product.meta.data" content="">
+<?php } ?>
+
   <button id="payapi-button" class="action primary tocart"><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>  
 
-<?php } ?>
 
 </div>

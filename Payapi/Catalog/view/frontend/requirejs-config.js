@@ -12,7 +12,7 @@ var config = {
         	deps: ['jquery']
         } ,
         'fngrui':  {
-        	deps: ['jquery','fngrui']
+        	deps: ['jquery','fngrtouch']
         },
         'fngrsdk':  {
         	deps: ['jquery','fngtouch','fngrui']

@@ -3,7 +3,9 @@ namespace Payapi\CheckoutPayment\Model;
 use Payapi\CheckoutPayment\Api\PayapiCallbackInterface;
 use Payapi\CheckoutPayment\Block\JWT\JWT;
 
- 
+ /**
+ * Defines the callback actions for async payments communication with PayApi
+ */
 class PayapiCallback implements PayapiCallbackInterface
 {
 
@@ -69,7 +71,6 @@ class PayapiCallback implements PayapiCallbackInterface
                     $result = json_encode(['order_id' => $order_id]);
                 }else if($jsonData->payment->status == 'failed'){
                     //Payment failure
-                    //restore stock
                     $order_id = $this->_helper->changeStatus($orderId,"canceled","canceled", "failed");     
                     $result = json_encode(['order_id' => $order_id]); 
                 }else if($jsonData->payment->status == 'chargeback'){            
@@ -77,7 +78,6 @@ class PayapiCallback implements PayapiCallbackInterface
                     $result = json_encode(['order_id' => $order_id]); 
                 }else{
                     //Payment cancelled
-                    //restore stock
                     $order_id = $this->_helper->changeStatus($orderId,"payment_review","payment_review", $jsonData->payment->status);     
                     $result = json_encode(['order_id' => $order_id]); 
                 }

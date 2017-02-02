@@ -1,0 +1,17 @@
+{
+    "name": "payapi/sample-bundle-all",
+    "description": "Integrating the PayApi Gateway for Magento 2.1",
+    "type": "metapackage",
+    "version": "1.0.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "payapi/language-fi_fi": "100.0.5",
+        "payapi/language-es_es": "100.0.5",
+        "payapi/language-en_gb": "100.0.5",
+        "payapi/catalog": "~1.0",
+        "payapi/checkoutpayment": "~1.0"        
+    }
+}

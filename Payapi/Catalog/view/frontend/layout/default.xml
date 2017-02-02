@@ -6,9 +6,9 @@
 </head>
 <body>
 	<referenceContainer name="page.wrapper" htmlClass="fngrsharesdk-container">
-        <block class="Payapi\Catalog\Block\Product\View\ProductListing"
+        <block class="Payapi\Catalog\Block\InstantBuyBlock"
             name="product.view.fngrsharesdk"
-            template="Payapi_Catalog::product/view/test.phtml"
+            template="Payapi_Catalog::product/view/fngrsharesdkgeneric.phtml"
             after="-">
         </block>
     </referenceContainer>

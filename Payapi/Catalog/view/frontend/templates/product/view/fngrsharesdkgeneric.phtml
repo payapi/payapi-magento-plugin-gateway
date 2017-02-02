@@ -9,14 +9,16 @@
 				var href = $(this).attr('href');
 				if(href && href.indexOf("payapiwebshop") < 0 ){
 					if (href.indexOf("?") >= 0 ){
-						href = href	+ '&payapiwebshop=1&ip=<?php echo $this->getVisitorIp(); ?>';
+						href = href	+ '&payapiwebshop=0&ip=<?php echo $this->getVisitorIp(); ?>';
 					}else{
-						href = href	+ '?payapiwebshop=1&ip=<?php echo $this->getVisitorIp(); ?>';
+						href = href	+ '?payapiwebshop=0&ip=<?php echo $this->getVisitorIp(); ?>';
 					}
 
 					href = href	+ '&hasMandatory=' + $(this).parent().find('button.payapi-button').attr('data-mandatory');
 					
 					$(this).attr('href', href);
+					$(this).closest("div.product-item-info").attr("fngrsharesdk-product-container",href);
+          
 				}
 			});
 

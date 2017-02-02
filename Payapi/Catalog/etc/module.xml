@@ -3,6 +3,7 @@
     <module name="Payapi_Catalog" setup_version="1.0.0">
         <sequence>
             <module name="Magento_Catalog"/>
+            <module name="Payapi_CheckoutPayment"/>
         </sequence>
     </module>
 </config>

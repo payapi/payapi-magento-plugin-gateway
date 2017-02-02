@@ -20,8 +20,6 @@ class Success extends \Magento\Framework\App\Action\Action
  
     public function execute()
     {
-
-        $this->_logger->debug("Success Page loaded");
         $session = $this->_objectManager->get('Magento\Checkout\Model\Session');
         $quote = $session->getQuote();
         $session->clearQuote();

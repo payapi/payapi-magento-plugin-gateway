@@ -32,7 +32,7 @@
                 </field>
                 <field id="instantbuy_shipping_method" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Default shipping method for Instant Buy</label>
-                    <source_model>Payapi\CheckoutPayment\Model\Config\AllActiveMethods</source_model>
+                    <source_model>Payapi\CheckoutPayment\Model\Config\AllActiveShippingMethods</source_model>
                 </field>
                 <field id="debug" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>

@@ -76,7 +76,6 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             )
             ->setIsCustomerNotified(true)
             ->save();
-            $this->_customlogger->debug("Added payment!");
             return $orderId;
         }
         throw new \Magento\Framework\Exception\LocalizedException(__('Could not add Payment to the order.'));
@@ -116,9 +115,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     
     public function createOrder($payapiObject){
 
-        $this->_customlogger->debug("START CREATE ORDER: ".json_encode($payapiObject));
         $extra = $payapiObject->products[0]->extraData;
-        $this->_customlogger->debug("START CREATE ORDER2: ".$extra);
         $merchantComment = "";
             if(isset($payapiObject->extraInputData) && isset($payapiObject->extraInputData->messageToMerchant)){
                 $merchantComment = $payapiObject->extraInputData->messageToMerchant;
@@ -127,7 +124,6 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         if(isset($extrasArr['quote'])){
             //WEBSHOP/INSTANT BUY
             $quoteId = intval($extrasArr['quote']);    
-            $this->_customlogger->debug("WEBSHOP QUOTEID: ".$quoteId);
             $this->quote = $this->_quoteRepository->get($quoteId); 
             $this->stockChanges = $this->checkStock($this->quote->getAllItems());
             return $this->saveOrder($this->quote,$payapiObject->consumer->email,$this->getShippingAddress($payapiObject), $merchantComment);
@@ -135,8 +131,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             //Update shipping address
         }else{
             //POST
-            $quoteId = intval($payapiObject->order->referenceId);          
-            $this->_customlogger->debug("POST QUOTEID: ".$quoteId);
+            $quoteId = intval($payapiObject->order->referenceId);   
             $this->quote = $this->_quoteRepository->get($quoteId);  
             $this->stockChanges = $this->checkStock($this->quote->getAllItems());
             
@@ -148,7 +143,6 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function saveOrder($cart, $email, $shippingAddress = false, $messageToMerchant = ""){
         //Set Address to quote @todo add section in order data for seperate billing and handle it
        
-        $this->_customlogger->debug("INIT SAVEORDER");
         $store=$this->_storeManager->getStore();
         $websiteId = $this->_storeManager->getStore()->getWebsiteId();
         $customer=$this->customerFactory->create();
@@ -168,29 +162,20 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $cart->setCustomerEmail($email);
 
         if($shippingAddress){
-            $this->_customlogger->debug("ADDING SHIPPHING: ".json_encode($shippingAddress));
             $cart->getBillingAddress()->addData($shippingAddress);
             $cart->getShippingAddress()->addData($shippingAddress);
         }
 
-       // $cart->collectTotals();
         // Submit the quote and create the order        
         $cart->save();
-
-
-
         
         $cart = $this->cartRepositoryInterface->get($cart->getId());
-        $stockObj = $this->_stockItemRepository->get($cart->getAllItems()[0]->getProductId());
-        $this->_customlogger->debug("final stock ".$stockObj->getQty()."Is processed inv: ".$cart->getInventoryProcessed());
-
-
         $order_id = $this->cartManagementInterface->placeOrder($cart->getId());
         
         
         $cart->setOrigOrderId($order_id);
         $cart->save();
-        $this->_customlogger->debug("SAVED QUOTE WITH ORDER ID");
+        $this->_customlogger->debug("SAVED QUOTE WITH ORDER ID ".$order_id);
         $order = $this->_orderRepository->get($order_id);
         $msg = __("Payment %1 event received. ","processing");
         
@@ -207,7 +192,6 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $order->save();
-        $this->_customlogger->debug("ORDER SAVED");
         return $order_id;
     }
 

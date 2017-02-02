@@ -35,39 +35,31 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
         $paymentHelper =  $this->_objectManager->get('\Magento\Payment\Helper\Data');
         $paymentMethod = $paymentHelper->getMethodInstance("payapi_checkoutpayment_secure_form_post");
         $this->_defaultShippingMethod = $paymentMethod->getConfigData('instantbuy_shipping_method');
-
-        $this->_logger->debug("Execute SecureFormGenerator. Constructor. Default shipping: ".$this->_defaultShippingMethod);
     	parent::__construct($context);
 	}
 	
 	public function execute() {
-        $this->_logger->debug("Execute SecureFormGenerator");
     	$result = $this->resultJsonFactory->create();
-        if ($this->getRequest()->isAjax()) {            
-            $this->_logger->debug("POST buy");   
+        if ($this->getRequest()->isAjax()) {     
             $referenceQuoteId = $this->getRequest()->getPostValue('referenceQuoteId');
-            $this->_logger->debug("POST buy QuoteId: ".$referenceQuoteId);   
-            $shippingExtraProd = $this->getRequest()->getPostValue('shippingProduct');
-            $this->_logger->debug("POST buy ExtraShipping:".json_encode($shippingExtraProd));   
-            $checkoutAddress = $this->getRequest()->getPostValue('checkoutAddress');
-            $this->_logger->debug("POST buy CheckoutAddress: ".json_encode($checkoutAddress));   
+            $shippingExtraProd = $this->getRequest()->getPostValue('shippingProduct');  
+            $checkoutAddress = $this->getRequest()->getPostValue('checkoutAddress');  
             $ipaddress = $this->getRequest()->getPostValue('ipaddress');
-            $this->_logger->debug("POST buy IpAddress: ".$ipaddress);   
             
             if(!$referenceQuoteId){  
                 $session = $this->_objectManager->get('Magento\Checkout\Model\Session');
                 $quote = $session->getQuote();
                 $referenceQuoteId = $quote->getId();
-                $this->_logger->debug("POST buy session QuoteId: ".$referenceQuoteId);   
             }
+
             $secureformObject = $this->postSecureForm($referenceQuoteId, $shippingExtraProd, $checkoutAddress, $ipaddress);
-                return $result->setData($secureformObject); 
+            return $result->setData($secureformObject); 
         }
     }
 
 	
     protected function postSecureForm($referenceQuoteId, $shippingExtraProd = false, $checkoutAddress = false, $ipaddress = ""){        
-        //Clone quote to make it indepentent of the cart and keeping it static
+
         $cart_id = $this->_cartManagementInterface->createEmptyCart();
         $referenceQuote = $this->_cartRepositoryInterface->get($referenceQuoteId);
         $newQuote = $this->_cartRepositoryInterface->get($cart_id);
@@ -79,7 +71,6 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
     }
 
     public function getInstantBuySecureForm($productId, $opts = ['qty => 1'], $ipaddress = ""){
-        $this->_logger->debug("GET INFO TO GENERATE METAS");                    
         $quote = $this->generateNewQuoteWithProduct($productId, $opts);
         if($quote){
             $secureformData = $this->completeQuoteAndGetData($quote, false,false, $ipaddress);
@@ -89,11 +80,9 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
     }
 
 
-    protected function generateNewQuoteWithProduct($productId, $opts = ['qty' => 1]){
-        $this->_logger->debug("Loading product ".$productId);
-              
-        $product = $this->_productRepository->getById($productId,false,$this->_store->getId());
+    protected function generateNewQuoteWithProduct($productId, $opts = ['qty' => 1]){         
 
+        $product = $this->_productRepository->getById($productId,false,$this->_store->getId());
 
         if($product){
             $quoteId = $this->_cartManagementInterface->createEmptyCart();
@@ -111,17 +100,12 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
         return $quote;
     }
 
-	protected function completeQuoteAndGetData($quote, $shippingExtraProd, $checkoutAddress = false, $ipaddress = ""){
-		$this->_logger->debug("COMPLETE QUOTE");
-        
-        //$websiteId = $store->getWebsiteId();
+	protected function completeQuoteAndGetData($quote, $shippingExtraProd, $checkoutAddress = false, $ipaddress = ""){        
                 
         $quote->setStore($this->_store);
-        // if you have already buyer id then you can load customer directly
         $quote->setCurrency();
         
         //Set customer if logged
-        //Customer login
         $customerSession = $this->_objectManager->get('Magento\Customer\Model\Session');
         $customer = null;
 
@@ -164,7 +148,6 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
         	   ];
         	}            
         }
-        $this->_logger->debug(json_encode($finalAddr));
         //Set Address to quote @todo add section in order data for seperate billing and handle it
         $quote->getBillingAddress()->addData($finalAddr);
         $quote->getShippingAddress()->addData($finalAddr);
@@ -197,7 +180,7 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
 
 
     protected function getSecureFormData($quoteTmp, $shippingAddress = [], $shippingExtraProd = false){
-        $this->_logger->debug("GENERATE SECURE FORM DATA .");
+        
         $totals = $quoteTmp->getShippingAddress()->getData();
 
         $baseExclTax = $totals['base_subtotal_with_discount'];
@@ -211,9 +194,7 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
             "currency" => $this->_store->getCurrentCurrencyCode(),
             "referenceId" => $quoteTmp->getId());
 
-        $items = $quoteTmp->getAllItems();
-        
-        $this->_logger->debug("items in quote .".count($items));
+        $items = $quoteTmp->getAllItems();        
         $products = array();
         if($items){
             foreach($items as $item) {      
@@ -287,18 +268,15 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
 	
 	protected function getShippingFromIp($ip) {		
         if(!$ip || $ip == ""){
-            $this->_logger->debug("No ip informed. getShippingFromIp");
             return null;
         }else{
             $visitorIp = $ip;
         }
 
-        $this->_logger->debug($visitorIp);
         $url = "https://input.payapi.io/v1/api/fraud/ipdata/".$visitorIp;
         $curl = $this->_objectManager->get('\Magento\Framework\HTTP\Client\Curl');
         $curl->get($url);
         $response = json_decode($curl->getBody(), true);
-        $this->_logger->debug(json_encode($response));
         $countryCode = null;
         $regionCode = '';
         if($response && isset($response['countryCode'])){
@@ -309,7 +287,6 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
         	if(isset($response['postalCode'])) 
                 $postalCode = $response['postalCode'];
             else $postalCode = "";
-            $this->_logger->debug($countryCode);
         }
         if($countryCode != null){
        		return [

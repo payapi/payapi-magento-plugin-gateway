@@ -9,12 +9,11 @@
             evt.preventDefault();
             var productUrl = $btnClicked.closest(".product-item-info").find('.fngrsharesdk-product').attr('href');
             if($btnClicked.attr('data-mandatory') !== "1"){
-              window.location = 'https://staging-input.payapi.io/v1/webshop/'+ encodeURIComponent(productUrl);
+              window.location = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(productUrl);
             }else{
               window.location = productUrl;
             }
           });
-
 	});
 
   </script>
