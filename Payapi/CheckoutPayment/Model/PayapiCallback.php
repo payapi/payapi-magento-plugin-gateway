@@ -1,5 +1,6 @@
 <?php
 namespace Payapi\CheckoutPayment\Model;
+
 use Payapi\CheckoutPayment\Api\PayapiCallbackInterface;
 use Payapi\CheckoutPayment\Block\JWT\JWT;
 

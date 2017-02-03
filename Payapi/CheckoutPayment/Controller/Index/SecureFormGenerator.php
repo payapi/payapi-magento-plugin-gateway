@@ -308,4 +308,3 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action {
     }
 
 }
-?>

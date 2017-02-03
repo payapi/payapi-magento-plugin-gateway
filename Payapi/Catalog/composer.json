@@ -1,6 +1,6 @@
 {
-  "name": "payapi/module-checkoutpayment",
-  "description": "Integrating the PayApi Gateway for Magento 2.1",
+  "name": "payapi/module-instantbuy",
+  "description": "Integrating the PayApi Instant Buy functionality for Magento 2",
   "type": "magento2-module",
   "version": "1.0.0",
   "license": [
@@ -17,7 +17,8 @@
     "magento/module-catalog": "100.0.*",
     "payapi/language-fi_fi": "100.0.5",
     "payapi/language-es_es": "100.0.5",
-    "payapi/language-en_gb": "100.0.5"  
+    "payapi/language-en_gb": "100.0.5",
+    "payapi/module-checkoutpayment": "~1.0"
 
   },
   "authors": [
@@ -39,7 +40,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "Payapi\\CheckoutPayment\\": ""
+            "Payapi\\Catalog\\": ""
         }
     }
 }

@@ -14,4 +14,3 @@ class ListProduct extends \Magento\Catalog\Block\Product\ListProduct
         return '';
     }
 }
-?>

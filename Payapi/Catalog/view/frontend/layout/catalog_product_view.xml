@@ -1,10 +1,25 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
 
-<body>	
+<body>    
+    <referenceContainer name="page.wrapper" htmlClass="fngrsharesdk-container fngrsharesdk-productpage">
+        <block class="Payapi\Catalog\Block\InstantBuyBlock"
+            name="product.view.fngrsharesdk.additional"
+            template="Payapi_Catalog::product/view/fngrsharesdkgeneric.phtml"
+            after="-">
+        </block>
+    </referenceContainer>
     <referenceContainer name="product.info.addtocart">
         <block class="Payapi\Catalog\Block\Product\View\ProductDetail"
             name="product.view.instantbuy"
+            template="Payapi_Catalog::product/view/productdetail.phtml"
+            after="-">
+        </block>        
+    </referenceContainer>
+    
+    <referenceContainer name="product.info.addtocart.additional">
+         <block class="Payapi\Catalog\Block\Product\View\ProductDetail"
+            name="product.view.instantbuy.additional"
             template="Payapi_Catalog::product/view/productdetail.phtml"
             after="-">
         </block>

@@ -29,4 +29,3 @@ class AllActiveShippingMethods extends \Magento\Shipping\Model\Config\Source\All
     }
 
 }
-?>

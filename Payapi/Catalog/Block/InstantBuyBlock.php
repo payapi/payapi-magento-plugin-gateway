@@ -30,11 +30,10 @@ class InstantBuyBlock extends \Magento\Framework\View\Element\Template {
     }   
 
     public function getVisitorIp($checkParams = true) {  
-    
         $ipaddress = '';
-        
-        if($checkParams && isset($_GET['ip'])){
-            return $_GET['ip'];
+        $paramIp = $this->getRequest()->getQueryValue('ip');
+        if($checkParams && $paramIp){
+            return $paramIp;
         }
         if (getenv('HTTP_CLIENT_IP'))
             $ipaddress = getenv('HTTP_CLIENT_IP');
@@ -66,4 +65,3 @@ class InstantBuyBlock extends \Magento\Framework\View\Element\Template {
         return 0;
     }
 }
-?>

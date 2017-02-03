@@ -12,7 +12,6 @@ ssh -oStrictHostKeyChecking=no $1 << HERE
 cd $2
 mkdir -p app/code
 rm -rf app/code/Payapi
-rm -rf app/code/i18n/payapi
 #Download file and unzip
 echo "Downloading..."
 wget 'https://storage.googleapis.com/public0/payapi-magento-plugin/latest/payapi-magento-plugin.zip' -O app/code/payapi-magento-plugin.zip

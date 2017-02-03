@@ -38,8 +38,9 @@ class ProductDetail extends AbstractProduct
     }
 
     public function getQty(){
-        if(isset($_GET["qty"]) && is_numeric($_GET["qty"]))
-            return intval($_GET["qty"]);
+        $val = $this->getRequest()->getQueryValue('qty');
+        if($val && is_numeric($val))
+            return intval($val);
         return 1;
     }
 
@@ -47,8 +48,9 @@ class ProductDetail extends AbstractProduct
         if($this->getProduct()){
             $customOptions = $this->_objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($this->getProduct());
             if($customOptions){
-                if(isset($_GET['options'])){
-                    return $_GET['options'];
+                $val = $this->getRequest()->getQueryValue('options');
+                if($val){
+                    return $val;
                 }
             }
         }

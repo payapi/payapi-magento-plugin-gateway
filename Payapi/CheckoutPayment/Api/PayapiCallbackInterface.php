@@ -10,5 +10,4 @@ interface PayapiCallbackInterface
      * @return empty json. Status 200.
      */
     public function callback();
-
 }

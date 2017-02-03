@@ -25,4 +25,3 @@ class CustomConfigProvider implements ConfigProviderInterface
         return $config;
     }
 }
-?>
