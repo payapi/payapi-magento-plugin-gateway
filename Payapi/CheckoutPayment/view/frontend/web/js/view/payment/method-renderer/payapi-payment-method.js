@@ -17,12 +17,13 @@ define(
         setPaymentMethodAction,
         additionalValidators,
         quote,
-        customerData, 
+        customerData,
         urlBuilder
     ) {
         'use strict';
 
-        return Component.extend({
+        return Component.extend(
+            {
             defaults: {
                 template: 'Payapi_CheckoutPayment/payment/payapi-payment-method',
                 
@@ -37,9 +38,9 @@ define(
                     setPaymentMethodAction(this.messageContainer).done(
                         function () {
                             customerData.invalidate(['cart']);
-                            var order = quote.totals();                                                
+                            var order = quote.totals();
                             var quoteId = window.checkoutConfig.quoteItemData[0].quote_id;
-                            var shippingMethod = quote.shippingMethod();                           
+                            var shippingMethod = quote.shippingMethod();
                             
                             var jsonProduct = {
                                 "id": shippingMethod.carrier_code+"_"+shippingMethod.method_code,
@@ -48,7 +49,7 @@ define(
                                 "priceInCentsIncVat" : Math.round(shippingMethod.price_incl_tax*100),
                                 "priceInCentsExcVat" : Math.round(shippingMethod.price_excl_tax*100),
                                 "vatInCents" : Math.round((shippingMethod.price_incl_tax-shippingMethod.price_excl_tax)*100),
-                                "vatPercentage" : parseFloat((shippingMethod.price_incl_tax-shippingMethod.price_excl_tax)*100/shippingMethod.price_excl_tax) 
+                                "vatPercentage" : parseFloat((shippingMethod.price_incl_tax-shippingMethod.price_excl_tax)*100/shippingMethod.price_excl_tax)
                             };
                             
                             var address = quote.shippingAddress();
@@ -74,16 +75,18 @@ define(
 
                             console.log(JSON.stringify(jsonData));
 
-                            $.ajax({
+                            $.ajax(
+                                {
                                 showLoader: true,
                                 type: "POST",
                                 url: "/payapipages/index/secureformgenerator",
                                 data: jsonData,
-                                success: function(data){
+                                success: function (data) {
                                     payapiSdk.configure(window.checkoutConfig.payment.customPayment.payapi_public_id, window.checkoutConfig.payment.customPayment.payapi_api_key);
                                     payapiSdk.postData(data);
                                 }
-                            });                    
+                                }
+                            );
                         }
                     );
 
@@ -91,6 +94,7 @@ define(
                 }
                                                 
             }
-        });
+            }
+        );
     }
 );

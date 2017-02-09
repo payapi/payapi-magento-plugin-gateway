@@ -1,13 +1,14 @@
 <?php
 namespace Payapi\CheckoutPayment\Api;
- 
+
 interface PayapiCallbackInterface
 {
     /**
-     * Run payapi callback
+     * Run PayApi callback actions.
      *
      * @api
-     * @return empty json. Status 200.
+     * @param string $data The encoded PayApi data
+     * @return string The Callback response JSON.
      */
-    public function callback();
+    public function callback($data);
 }

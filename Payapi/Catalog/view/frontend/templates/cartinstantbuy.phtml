@@ -1,17 +1,16 @@
 
 <div>
-
-<?php if($this->checkPayApiConfiguration()) { ?>
-<script>
-require(['jquery', 
+<?php if ($block->checkPayApiConfiguration()) {?>
+<script type="text/x-magento-init">
+require(['jquery',
         'payapiSdk'],function($){
- 	
+
     var $btnClicked = $("#payapi-instantbutton");
-	$btnClicked.click(function(evt){
+    $btnClicked.click(function(evt){
         evt.preventDefault();
         var jsonData = {
             "referenceQuoteId": window.checkoutConfig.quoteItemData[0].quote_id,
-            "ipaddress":"<?php echo $this->getVisitorIp();?>"
+            "ipaddress":"<?php /* @escapeNotVerified */echo $block->getVisitorIp(); ?>"
         };
         $.ajax({
             showLoader: true,
@@ -19,13 +18,16 @@ require(['jquery',
             url: "/payapipages/index/secureformgenerator",
             data: jsonData,
             success: function(data){
-                payapiSdk.configure(window.checkoutConfig.payment.customPayment.payapi_public_id, window.checkoutConfig.payment.customPayment.payapi_api_key);
+                payapiSdk.configure(window.checkoutConfig.payment.customPayment.payapi_public_id,
+                                     window.checkoutConfig.payment.customPayment.payapi_api_key);
                 payapiSdk.postData(data);
             }
-        });    
-    });			
+        });
+    });
 });
 </script>
-  <button id="payapi-instantbutton" class="action primary checkout"><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>  
-  <?php } ?>
+  <button id="payapi-instantbutton" class="action primary checkout">
+    <span><?php /* @escapeNotVerified */echo __('Instant Buy') ?></span>
+</button>
+<?php }?>
 </div>

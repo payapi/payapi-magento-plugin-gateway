@@ -1,35 +1,38 @@
 <div class="test">
 
-<?php if($this->checkPayApiConfiguration()) { ?>
-<script type="text/javascript">
+<?php if ($block->checkPayApiConfiguration()) {
+    ?>
+<script type="text/x-magento-init">
 	require(['jquery','payapiSdk'],function($){
 		require(['fngrtouch','fngrui','fngrsdk'],function(){
 			$("a.product-item-photo").each(function(){
 				$(this).addClass("fngrsharesdk-product");
 				var href = $(this).attr('href');
-				if(href && href.indexOf("payapiwebshop") < 0 ){
+				if (href && href.indexOf("payapiwebshop") < 0 ){
 					if (href.indexOf("?") >= 0 ){
-						href = href	+ '&payapiwebshop=0&ip=<?php echo $this->getVisitorIp(); ?>';
-					}else{
-						href = href	+ '?payapiwebshop=0&ip=<?php echo $this->getVisitorIp(); ?>';
+						href = href	+ '&payapiwebshop=1&ip=<?php /* @escapeNotVerified */echo $block->getVisitorIp(); ?>';
+					} else {
+						href = href	+ '?payapiwebshop=1&ip=<?php /* @escapeNotVerified */echo $block->getVisitorIp(); ?>';
 					}
 
 					href = href	+ '&hasMandatory=' + $(this).parent().find('button.payapi-button').attr('data-mandatory');
-					
+
 					$(this).attr('href', href);
 					$(this).closest("div.product-item-info").attr("fngrsharesdk-product-container",href);
-          
+
 				}
 			});
 
-			
+
 			window.setTimeout(function(){
-        		$("#top-cart-btn-checkout").after("<button class='action primary checkout' style='margin-top:10px' id='payapi-mini-instantbuy'><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>");
+        		$("#top-cart-btn-checkout").after(
+        			"<button class='action primary checkout' style='margin-top:10px' id='payapi-mini-instantbuy'><span><?php
+/* @escapeNotVerified */echo __('Instant Buy') ?></span></button>");
         		var $btnClicked = $("#payapi-mini-instantbuy");
 				$btnClicked.click(function(evt){
 			        evt.preventDefault();
 			        var jsonData = {
-			            "ipaddress":"<?php echo $this->getVisitorIp();?>"
+			            "ipaddress":"<?php /* @escapeNotVerified */echo $block->getVisitorIp(); ?>"
 			        };
 			        $.ajax({
 			            showLoader: true,
@@ -37,15 +40,16 @@
 			            url: "/payapipages/index/secureformgenerator",
 			            data: jsonData,
 			            success: function(data){
-			                payapiSdk.configure("<?php echo $this->getPublicId()?>", "<?php echo $this->getApiKey()?>");
+			                payapiSdk.configure("<?php /* @escapeNotVerified */echo $block->getPublicId() ?>", "<?php
+/* @escapeNotVerified */echo $block->getApiKey() ?>");
 			                payapiSdk.postData(data);
 			            }
-			        });    
-			    });	
+			        });
+			    });
 
     		},5000);
 		});
   	});
 </script>
-<?php } ?>
+<?php }?>
 </div>

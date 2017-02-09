@@ -10,25 +10,7 @@ class PayapiPaymentMethod extends AbstractMethod
 {
     const CODE = 'payapi_checkoutpayment_secure_form_post';
 
-  /*  protected $_isGateway                   = true;
-    protected $_canCapture                  = true;
-    protected $_canCapturePartial           = true;
-    protected $_canRefund                   = true;
-    protected $_canRefundInvoicePartial     = true;
-    protected $_canAuthorize                = true;*/
-
-
-    protected $_isOffline = true;
-
-    protected $_payapiApiKey = false;
-    protected $_payapiPublicId = false;
-    
-    /**
-     * @var string
-     */
-    protected $_code = self::CODE;
-
-     public function __construct(
+    public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
@@ -38,6 +20,10 @@ class PayapiPaymentMethod extends AbstractMethod
         \Magento\Payment\Model\Method\Logger $logger,
         array $data = array()
     ) {
+
+        $this->_isOffline = true;
+        $this->_code      = self::CODE;
+
         parent::__construct(
             $context,
             $registry,
@@ -50,12 +36,7 @@ class PayapiPaymentMethod extends AbstractMethod
             null,
             $data
         );
-        
-        $this->_payapiApiKey = $this->getConfigData('payapi_api_key');
-        $this->_payapiPublicId = $this->getConfigData('payapi_public_id');
     }
-
-
 
     /**
      * Determine method availability based on quote amount and config data
@@ -66,7 +47,7 @@ class PayapiPaymentMethod extends AbstractMethod
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         $this->_logger->debug("isAvaliable Payapi");
-        
+
         if (!$this->getConfigData('payapi_api_key') || !$this->getConfigData('payapi_public_id')) {
             return false;
         }
@@ -82,10 +63,6 @@ class PayapiPaymentMethod extends AbstractMethod
      */
     public function canUseForCurrency($currencyCode)
     {
-        /*if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
-            $this->_logger->debug("Payapi. currency  USD");
-            return false;
-        }*/
         //All currecy
         return true;
     }

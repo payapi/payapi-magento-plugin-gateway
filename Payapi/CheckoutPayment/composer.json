@@ -2,7 +2,7 @@
   "name": "payapi/module-checkoutpayment",
   "description": "Integrating the PayApi Gateway for Magento 2.1",
   "type": "magento2-module",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "license": [
     "OSL-3.0",
     "AFL-3.0"
@@ -14,11 +14,8 @@
     "magento/module-payment": "*",
     "magento/module-quote": "*",
     "magento/module-checkout": "100.0.*",
-    "magento/module-catalog": "100.0.*",
-    "payapi/language-fi_fi": "100.0.5",
-    "payapi/language-es_es": "100.0.5",
-    "payapi/language-en_gb": "100.0.5"  
-
+    "magento/module-catalog": "100.0.*",    
+    "firebase/php-jwt": "~2.2.0"
   },
   "authors": [
     {

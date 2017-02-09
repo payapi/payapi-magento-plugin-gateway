@@ -1,23 +1,27 @@
 
-<?php if($this->checkPayApiConfiguration()) { ?>
+<?php if ($block->checkPayApiConfiguration()) {?>
 
-  <script>
+  <script type="text/x-magento-init">
   require(['jquery'],function($){
 
-          var $btnClicked = $("#payapi-button<?php echo $this->getProduct()->getId(); ?>");
+          var $btnClicked = $("#payapi-button<?php /* @escapeNotVerified */echo $block->getProduct()->getId(); ?>");
           $btnClicked.click(function(evt){
             evt.preventDefault();
             var productUrl = $btnClicked.closest(".product-item-info").find('.fngrsharesdk-product').attr('href');
-            if($btnClicked.attr('data-mandatory') !== "1"){
-              window.location = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(productUrl);
-            }else{
+            if ($btnClicked.attr('data-mandatory') !== "1"){
+              window.location = 'https://staging-input.payapi.io/v1/webshop/'+ encodeURIComponent(productUrl);
+            } else {
               window.location = productUrl;
             }
           });
-	});
+  });
 
   </script>
 
-  <button data-mandatory="<?php echo $this->checkMandatoryFields(); ?>" id="payapi-button<?php echo $this->getProduct()->getId(); ?>" class="action primary tocart payapi-button" style="margin-bottom:10px"><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>  
-  
-<?php } ?>
+  <button data-mandatory="<?php /* @escapeNotVerified */echo $block->checkMandatoryFields() ?>" id="payapi-button<?php
+/* @escapeNotVerified */echo $block->getProduct()->getId(); ?>"
+ class="action primary tocart payapi-button" style="margin-bottom:10px">
+ <span><?php /* @escapeNotVerified */echo __('Instant Buy') ?></span>
+ </button>
+
+<?php }?>

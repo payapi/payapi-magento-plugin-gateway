@@ -7,16 +7,6 @@ namespace Payapi\CheckoutPayment\Model\Config;
 
 class AllActiveShippingMethods extends \Magento\Shipping\Model\Config\Source\Allmethods
 {
-    /**
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Shipping\Model\Config $shippingConfig
-     */
-    public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Shipping\Model\Config $shippingConfig
-    ) {
-        parent::__construct($scopeConfig,$shippingConfig);
-    }
 
     /**
      * Return array of active carriers.
@@ -27,5 +17,4 @@ class AllActiveShippingMethods extends \Magento\Shipping\Model\Config\Source\All
     {
         return parent::toOptionArray(true);
     }
-
 }

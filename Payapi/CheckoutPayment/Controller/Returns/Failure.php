@@ -6,17 +6,15 @@ use Magento\Framework\App\Action\Context;
  
 class Failure extends \Magento\Framework\App\Action\Action
 {
-    protected $_resultPageFactory;
- 
     public function __construct(Context $context, \Magento\Framework\View\Result\PageFactory $resultPageFactory)
     {
-        $this->_resultPageFactory = $resultPageFactory;
+        $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
  
     public function execute()
     {
-        $resultPage = $this->_resultPageFactory->create();
+        $resultPage = $this->resultPageFactory->create();
         return $resultPage;
     }
 }

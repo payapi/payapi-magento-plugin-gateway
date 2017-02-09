@@ -5,15 +5,12 @@ use Monolog\Logger;
 
 class Handler extends \Magento\Framework\Logger\Handler\Base
 {
-    /**
-     * Logging level
-     * @var int
-     */
-    protected $loggerType = Logger::DEBUG;
-
-    /**
-     * File name
-     * @var string
-     */
-    protected $fileName = '/var/log/payapi.log';
+    public function __construct(
+        \Magento\Framework\Filesystem\DriverInterface $filesystem,
+        $filePath = null
+    ) {
+        $this->loggerType = Logger::DEBUG;
+        $this->fileName   = '/var/log/payapi.log';
+        parent::__construct($filesystem, $filePath);
+    }
 }

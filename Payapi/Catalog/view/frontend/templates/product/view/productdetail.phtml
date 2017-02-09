@@ -1,42 +1,43 @@
 
 <div>
-<?php if($this->checkPayApiConfiguration()) { ?>
+<?php if ($block->checkPayApiConfiguration()) {
+    ?>
 
-  <script>  
+  <script type="text/x-magento-init">
   var _payapi = {
     checkMandatory: function _checkMandatory(url,silencePopup,msg){
         var $toCartForm = $("#product_addtocart_form");
         var isValid = $toCartForm.validation('isValid');
-        if(!isValid){
-            if(!silencePopup){
+        if (!isValid){
+            if (!silencePopup){
               alert(msg);
             }
           return '';
         }
         //Add product options to the currUrl
         var opts = decodeURIComponent($toCartForm.find(":input:not(:hidden)").serialize());
-        
+
         var productUrl = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
-        if(url.indexOf("payapiwebshop=1") > 0){
+        if (url.indexOf("payapiwebshop=1") > 0) {
           productUrl = 'https://staging-input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
-        }else if(url.indexOf("payapiwebshop=0") > 0){
+        }else if (url.indexOf("payapiwebshop=0") > 0) {
           productUrl = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
         }
 
-        if(silencePopup)
+        if (silencePopup)
           return productUrl;
         window.location = productUrl;
     }
   };
 
   require(['jquery','mage/translate'],function($){
-  			console.log("inicio payapi 4");
+        console.log("inicio payapi 4");
         var msg = $.mage.__("Please fill in all of the required fields");
 
         var currUrl = window.location.href;
         $("meta[name='product.meta.data']").attr("content", currUrl);
 
-      		var $btnClicked = $("#payapi-button");
+          var $btnClicked = $("#payapi-button");
           $btnClicked.click(function(evt){
             evt.preventDefault();
             _payapi.checkMandatory(currUrl,false,msg);
@@ -45,41 +46,65 @@
         var $toCartForm = $("#product_addtocart_form");
         $toCartForm.change(function(){
 
-          var currUrl = window.location.href;                  
+          var currUrl = window.location.href;
           var opts = decodeURIComponent($toCartForm.find(":input:not(:hidden)").serialize());
           currUrl = currUrl+"&"+opts;
           $("meta[name='product.meta.data']").attr("content", currUrl);
         });
 
-	});
+  });
   </script>
-<?php if($this->getSecureFormData() && count($this->getSecureFormData()->products) > 1){ ?>
-<meta name="io.payapi.webshop" content="<?php echo $this->getInstantBuyBlock()->getPublicId(); ?>">
-<meta name="order.currency" content="<?php echo $this->getSecureFormData()->order->currency; ?>">
-<meta name="order.shippingHandlingFeeInCentsExcVat" content="<?php echo $this->getSecureFormData()->products[1]->priceInCentsExcVat; ?>">
-<meta name="order.shippingHandlingFeeInCentsIncVat" content="<?php echo $this->getSecureFormData()->products[1]->priceInCentsIncVat; ?>">
-<meta name="product.id" content="<?php echo $this->getSecureFormData()->products[0]->id; ?>">
-<meta name="product.quantity" content="<?php echo $this->getSecureFormData()->products[0]->quantity; ?>">
-<meta name="product.title" content="<?php echo $this->getSecureFormData()->products[0]->title; ?>">
-<meta name="product.imageUrl" content="<?php echo $this->getSecureFormData()->products[0]->imageUrl; ?>">
-<meta name="product.priceInCentsIncVat" content="<?php echo $this->getSecureFormData()->products[0]->priceInCentsIncVat; ?>">
-<meta name="product.priceInCentsExcVat" content="<?php echo $this->getSecureFormData()->products[0]->priceInCentsExcVat; ?>">
-<meta name="product.vatInCents" content="<?php echo $this->getSecureFormData()->products[0]->vatInCents; ?>">
-<meta name="product.vatPercentage" content="<?php echo $this->getSecureFormData()->products[0]->vatPercentage; ?>">
-<meta name="product.hasMandatoryFields" content="<?php echo $this->checkMandatoryFields(); ?>">
-<meta name="consumer.email" content="<?php echo $this->getSecureFormData()->consumer->email; ?>">
-<!--<meta name="consumer.mobilePhoneNumber" content="<?php //echo $this->getSecureFormData()->consumer->mobilePhoneNumber; ?>"> -->
-<meta name="consumer.locale" content="<?php echo $this->getSecureFormData()->consumer->locale; ?>">
-<meta name="callbacks.processing" content="<?php echo $this->getSecureFormData()->callbacks->processing; ?>">
-<meta name="callbacks.success" content="<?php echo $this->getSecureFormData()->callbacks->success; ?>">
-<meta name="callbacks.failed" content="<?php echo $this->getSecureFormData()->callbacks->failed; ?>">
-<meta name="callbacks.chargeback" content="<?php echo $this->getSecureFormData()->callbacks->chargeback; ?>">
-<meta name="returnUrls.success" content="<?php echo $this->getSecureFormData()->returnUrls->success; ?>">
-<meta name="returnUrls.cancel" content="<?php echo $this->getSecureFormData()->returnUrls->cancel; ?>">
-<meta name="returnUrls.failed" content="<?php echo $this->getSecureFormData()->returnUrls->failed; ?>">
-<?php } ?>
-<meta name="product.extraData" content="<?php echo $this->getExtraData(); ?>">
+<?php if ($block->getSecureFormData() && count($block->getSecureFormData()->products) > 1) {?>
+<meta name="io.payapi.webshop" content="<?php
+/* @escapeNotVerified */echo $block->getInstantBuyBlock()->getPublicId(); ?>">
+<meta name="order.currency" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->order->currency; ?>">
+<meta name="order.shippingHandlingFeeInCentsExcVat" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[1]->priceInCentsExcVat; ?>">
+<meta name="order.shippingHandlingFeeInCentsIncVat" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[1]->priceInCentsIncVat; ?>">
+<meta name="product.id" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[0]->id; ?>">
+<meta name="product.quantity" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[0]->quantity; ?>">
+<meta name="product.title" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[0]->title; ?>">
+<meta name="product.imageUrl" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[0]->imageUrl; ?>">
+<meta name="product.priceInCentsIncVat" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[0]->priceInCentsIncVat; ?>">
+<meta name="product.priceInCentsExcVat" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[0]->priceInCentsExcVat; ?>">
+<meta name="product.vatInCents" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[0]->vatInCents; ?>">
+<meta name="product.vatPercentage" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->products[0]->vatPercentage; ?>">
+<meta name="product.hasMandatoryFields" content="<?php
+/* @escapeNotVerified */echo $block->checkMandatoryFields(); ?>">
+<meta name="consumer.email" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->consumer->email; ?>">
+<meta name="consumer.locale" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->consumer->locale; ?>">
+<meta name="callbacks.processing" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->callbacks->processing; ?>">
+<meta name="callbacks.success" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->callbacks->success; ?>">
+<meta name="callbacks.failed" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->callbacks->failed; ?>">
+<meta name="callbacks.chargeback" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->callbacks->chargeback; ?>">
+<meta name="returnUrls.success" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->returnUrls->success; ?>">
+<meta name="returnUrls.cancel" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->returnUrls->cancel; ?>">
+<meta name="returnUrls.failed" content="<?php
+/* @escapeNotVerified */echo $block->getSecureFormData()->returnUrls->failed; ?>">
+<?php }?>
+<meta name="product.extraData" content="<?php
+/* @escapeNotVerified */echo $block->getExtraData(); ?>">
 <meta name="product.meta.data" content="">
-<button id="payapi-button" class="action primary tocart"><span><?php /* @escapeNotVerified */ echo __('Instant Buy') ?></span></button>
-<?php } ?>
+<button id="payapi-button" class="action primary tocart">
+  <span><?php /* @escapeNotVerified */echo __('Instant Buy') ?></span>
+</button>
+<?php }?>
 </div>
