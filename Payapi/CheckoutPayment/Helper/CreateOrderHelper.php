@@ -208,7 +208,6 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $i++;
             $stockObj = $this->stockItemRepository->get($item->getProductId());
             if ($stockObj && $item->getQty() > $stockObj->getQty()) {
-
                 $original = $stockObj->getQty();
                 $newQty   = $item->getQty();
 

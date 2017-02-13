@@ -18,7 +18,7 @@ class PayapiPaymentMethod extends AbstractMethod
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Payment\Model\Method\Logger $logger,
-        array $data = array()
+        array $data = []
     ) {
 
         $this->_isOffline = true;
