@@ -1,8 +1,9 @@
 {
-	"staging": false,
+	"staging": true,
 	"sharedVia": "",
 	"featureEnablePurchases": true,
 	"featureEnableProductImageIcons": true,
+	"featureEnableAddToShoppingCart": false,
 	"shareCircleWhitelist":{		
 		"mobile": [],
 		"desktop": []
