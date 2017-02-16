@@ -1,10 +1,10 @@
 
-<?php if ($block->checkPayApiConfiguration()) {?>
+<?php if (false && $block->checkPayApiConfiguration()) {?>
 
-  <script type="text/x-magento-init">
+  <script>
   require(['jquery'],function($){
 
-          var $btnClicked = $("#payapi-button<?php /* @escapeNotVerified */echo $block->getProduct()->getId(); ?>");
+          var $btnClicked = $("#payapi-button<?php echo $block->escapeHtml($block->getProduct()->getId()); ?>");
           $btnClicked.click(function(evt){
             evt.preventDefault();
             var productUrl = $btnClicked.closest(".product-item-info").find('.fngrsharesdk-product').attr('href');
@@ -18,10 +18,10 @@
 
   </script>
 
-  <button data-mandatory="<?php /* @escapeNotVerified */echo $block->checkMandatoryFields() ?>" id="payapi-button<?php
-/* @escapeNotVerified */echo $block->getProduct()->getId(); ?>"
+  <button data-mandatory="<?php echo $block->escapeHtml($block->checkMandatoryFields()) ?>" id="payapi-button<?php
+ echo $block->escapeHtml($block->getProduct()->getId()); ?>"
  class="action primary tocart payapi-button" style="margin-bottom:10px">
- <span><?php /* @escapeNotVerified */echo __('Instant Buy') ?></span>
+ <span><?php echo $block->escapeHtml(__('Instant Buy')) ?></span>
  </button>
 
 <?php }?>

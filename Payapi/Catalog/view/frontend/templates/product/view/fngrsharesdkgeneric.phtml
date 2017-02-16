@@ -2,37 +2,73 @@
 
 <?php if ($block->checkPayApiConfiguration()) {
     ?>
-<script type="text/x-magento-init">
+  
+<script>
+
 	require(['jquery','payapiSdk'],function($){
 		require(['fngrtouch','fngrui','fngrsdk'],function(){
-			$("a.product-item-photo").each(function(){
-				$(this).addClass("fngrsharesdk-product");
-				var href = $(this).attr('href');
-				if (href && href.indexOf("payapiwebshop") < 0 ){
-					if (href.indexOf("?") >= 0 ){
-						href = href	+ '&payapiwebshop=1&ip=<?php /* @escapeNotVerified */echo $block->getVisitorIp(); ?>';
-					} else {
-						href = href	+ '?payapiwebshop=1&ip=<?php /* @escapeNotVerified */echo $block->getVisitorIp(); ?>';
-					}
+			$("a.product-item-photo").addClass("fngrsharesdk-product");
+			var itemsIds = {
+					"itemsIds": [1,2,3]
+			};
 
-					href = href	+ '&hasMandatory=' + $(this).parent().find('button.payapi-button').attr('data-mandatory');
+			$.ajax({
+				showLoader:false,
+				type: "POST",
+				url: "/payapipages/index/checkmandatoryfields",
+				data: itemsIds,
+				success: function(data){
+						$.each(data, function(key, value) {
+    					$("#payapi-button"+key).attr('data-mandatory',value);
+						});
+						$(".fngrsharesdk-product").each(function(){				
+									var href = $(this).attr('href');
+									if (href && href.indexOf("payapiwebshop") < 0 ){
+										if (href.indexOf("?") >= 0 ){
+											href = href	+ '&payapiwebshop=1&ip=<?php echo $block->escapeHtml($block->getVisitorIp()); ?>';
+										} else {
+											href = href	+ '?payapiwebshop=1&ip=<?php echo $block->escapeHtml($block->getVisitorIp()); ?>';
+										}
 
-					$(this).attr('href', href);
-					$(this).closest("div.product-item-info").attr("fngrsharesdk-product-container",href);
+										href = href	+ '&hasMandatory=' + $(this).parent().find('button.payapi-button').attr('data-mandatory');
 
+										$(this).attr('href', href);
+										$(this).closest("div.product-item-info").attr("fngrsharesdk-product-container",href);					
+									}
+							});
 				}
 			});
 
+			$(".price-box:not(.product-info-price .price-box)").after(function(){
+						return "<button data-mandatory='<?php echo $block->escapeHtml($block->checkMandatoryFields()) ?>' "		
+						+ "id='payapi-button" + $(this).attr('data-product-id')+"' "	
+						+ "class='action primary tocart payapi-button' style='margin-bottom:10px'>"
+			 		+ "<span><?php echo $block->escapeHtml(__('Instant Buy')) ?></span>"
+			 		+ "</button>";
+ 		});
+
+ 		$(".payapi-button").click(function(evt){
+            evt.preventDefault();
+            var productUrl = $(this).parent().find('.fngrsharesdk-product').attr('href');
+            if(!productUrl){
+            		productUrl = $(this).closest(".product-item-info").find('.fngrsharesdk-product').attr('href');
+            }
+            if ($(this).attr('data-mandatory') !== "1"){
+              window.location = 'https://staging-input.payapi.io/v1/webshop/'+ encodeURIComponent(productUrl);
+            } else {
+              window.location = productUrl;
+            }
+          });
 
 			window.setTimeout(function(){
         		$("#top-cart-btn-checkout").after(
         			"<button class='action primary checkout' style='margin-top:10px' id='payapi-mini-instantbuy'><span><?php
-/* @escapeNotVerified */echo __('Instant Buy') ?></span></button>");
+echo $block->escapeHtml(__('Instant Buy'))?></span></button>");
         		var $btnClicked = $("#payapi-mini-instantbuy");
 				$btnClicked.click(function(evt){
 			        evt.preventDefault();
 			        var jsonData = {
-			            "ipaddress":"<?php /* @escapeNotVerified */echo $block->getVisitorIp(); ?>"
+			            "ipaddress":"<?php echo $block->escapeHtml($block->getVisitorIp()); ?>"
 			        };
 			        $.ajax({
 			            showLoader: true,
@@ -40,8 +76,8 @@
 			            url: "/payapipages/index/secureformgenerator",
 			            data: jsonData,
 			            success: function(data){
-			                payapiSdk.configure("<?php /* @escapeNotVerified */echo $block->getPublicId() ?>", "<?php
-/* @escapeNotVerified */echo $block->getApiKey() ?>");
+			                payapiSdk.configure("<?php echo $block->escapeHtml($block->getPublicId()) ?>", "<?php
+echo $block->escapeHtml($block->getApiKey())?>");
 			                payapiSdk.postData(data);
 			            }
 			        });

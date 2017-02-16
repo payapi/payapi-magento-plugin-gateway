@@ -5,11 +5,12 @@
         <css src="Payapi_Catalog::fngrsharesdk/sdk.min.css" />      
 </head>
 <body>
-	<referenceContainer name="page.wrapper" htmlClass="fngrsharesdk-container">
+	<referenceContainer name="page.wrapper" htmlClass="fngrsharesdk-container" cacheable="false">
         <block class="Payapi\Catalog\Block\InstantBuyBlock"
             name="product.view.fngrsharesdk"
             template="Payapi_Catalog::product/view/fngrsharesdkgeneric.phtml"
-            after="-">
+            after="-"
+            cacheable="false">
         </block>
     </referenceContainer>
 </body>

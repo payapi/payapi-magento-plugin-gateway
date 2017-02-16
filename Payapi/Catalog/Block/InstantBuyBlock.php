@@ -8,9 +8,11 @@ class InstantBuyBlock extends \Magento\Framework\View\Element\Template
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Payment\Helper\Data $paymentHelper,
+        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         array $data = []
     ) {
         $this->paymentHelper = $paymentHelper;
+        $this->remoteAddress = $remoteAddress;
         parent::__construct($context, $data);
     }
 
@@ -40,28 +42,16 @@ class InstantBuyBlock extends \Magento\Framework\View\Element\Template
         $paramIp   = $this->getRequest()->getQueryValue('ip');
         if ($checkParams && $paramIp) {
             return $paramIp;
+        } else { 
+            $ipaddress = $this->getRequest()->getClientIp();
         }
-        if (getenv('HTTP_CLIENT_IP')) {
-            $ipaddress = getenv('HTTP_CLIENT_IP');
-        } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
-            $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
-        } elseif (getenv('HTTP_X_FORWARDED')) {
-            $ipaddress = getenv('HTTP_X_FORWARDED');
-        } elseif (getenv('HTTP_FORWARDED_FOR')) {
-            $ipaddress = getenv('HTTP_FORWARDED_FOR');
-        } elseif (getenv('HTTP_FORWARDED')) {
-            $ipaddress = getenv('HTTP_FORWARDED');
-        } elseif (getenv('REMOTE_ADDR')) {
-            $ipaddress = getenv('REMOTE_ADDR');
-        }
-
         return $ipaddress;
     }
 
     public function checkMandatoryFields()
     {
         if ($this->getProduct()) {
-            $customOptions = $this->getProduct()->getProductOptionsCollection();            
+            $customOptions = $this->getProduct()->getProductOptionsCollection();
             if ($customOptions) {
                 foreach ($customOptions as $o) {
                     if ($o->getIsRequire()) {

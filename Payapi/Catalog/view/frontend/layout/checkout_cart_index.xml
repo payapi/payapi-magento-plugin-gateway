@@ -11,7 +11,8 @@
             <block class="Payapi\Catalog\Block\InstantBuyBlock"
             name="product.view.instantbuy"
             template="Payapi_Catalog::cartinstantbuy.phtml"
-            before="checkout.cart.methods.onepage.bottom">
+            before="checkout.cart.methods.onepage.bottom"
+            cacheable="false">
         </block>
         </referenceContainer>
     </body>

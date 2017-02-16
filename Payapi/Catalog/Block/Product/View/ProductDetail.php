@@ -7,39 +7,41 @@ use Magento\Catalog\Block\Product\AbstractProduct;
 class ProductDetail extends AbstractProduct
 {
     public function __construct(
-        \Payapi\CheckoutPayment\Logger\Logger $logger,
         \Magento\Catalog\Block\Product\Context $context,
         \Payapi\Catalog\Block\InstantBuyBlock $instantBuyBlock,
-        \Payapi\CheckoutPayment\Controller\Index\SecureFormGenerator $secureFormGenerator,
+        \Payapi\CheckoutPayment\Helper\SecureFormHelper $secureFormHelper,
+        \Payapi\CheckoutPayment\Logger\Logger $logger,
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->instantBuyBlock     = $instantBuyBlock;
-        $this->secureFormGenerator = $secureFormGenerator;
-        $this->secureformData      = false;
-        $this->visitorIp           = "";
-        $this->logger              = $logger;
+        $this->instantBuyBlock  = $instantBuyBlock;
+        $this->secureFormHelper = $secureFormHelper;
+        $this->secureformData   = false;
+        $this->visitorIp        = "";
+        $this->logger = $logger;
     }
 
     public function checkPayApiConfiguration()
     {
+        $this->logger->debug("checkPayApiConfiguration");
         if ($this->instantBuyBlock->checkPayApiConfiguration()) {
             $this->visitorIp = $this->instantBuyBlock->getVisitorIp();
             //Just generate metas if invoker has different domain
-            //if ($this->visitorIp != $this->instantBuyBlock->getVisitorIp(false)) {
-            $param = ['qty' => $this->getQty()];
-            $opts  = $this->getMandatoryValues();
-            if (!empty($opts)) {
-                 $this->logger->debug("hasMandatoryValues 3");
-                $param['options'] = $opts;
+            $this->logger->debug("checkPayApiConfiguration 2");
+            $clientIp = $this->instantBuyBlock->getVisitorIp(false);
+            $this->logger->debug($this->visitorIp . " --- ".$clientIp);
+            if ($this->visitorIp != $clientIp) {
+                $param = ['qty' => $this->getQty()];
+                $opts  = $this->getMandatoryValues();
+                if (!empty($opts)) {
+                    $param['options'] = $opts;
+                }
+                $this->secureformData = $this->secureFormHelper->getInstantBuySecureForm(
+                    $this->getProduct()->getId(),
+                    $param,
+                    $this->visitorIp
+                );
             }
-             $this->logger->debug("Before ". json_encode($param). " -- ".$this->visitorIp);
-            $this->secureformData = $this->secureFormGenerator->getInstantBuySecureForm(
-                $this->getProduct()->getId(),
-                $param,
-                $this->visitorIp
-            );
-            // }
             return true;
         }
         return false;
@@ -60,7 +62,6 @@ class ProductDetail extends AbstractProduct
         if ($this->getProduct()) {
             $customOptions = $this->getProduct()->getProductOptionsCollection();
             if ($customOptions) {
-                $this->logger->debug("Start getMandatoryValues 2");
                 $val = $this->getRequest()->getQueryValue('options');
                 if ($val) {
                     return $val;
@@ -95,7 +96,7 @@ class ProductDetail extends AbstractProduct
     }
 
     public function getExtraData()
-    {
+    { 
         if ($this->getSecureFormData()) {
             return 'quote=' . $this->getSecureFormData()->order->referenceId;
         }
@@ -105,5 +106,10 @@ class ProductDetail extends AbstractProduct
     public function getInstantBuyBlock()
     {
         return $this->instantBuyBlock;
+    }
+
+    public function getStockItem()
+    {
+        return $this->stockItemRepository->get($this->getProduct()->getId());
     }
 }

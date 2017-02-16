@@ -1,7 +1,7 @@
 
 <div>
 <?php if ($block->checkPayApiConfiguration()) {?>
-<script type="text/x-magento-init">
+<script>
 require(['jquery',
         'payapiSdk'],function($){
 
@@ -10,7 +10,7 @@ require(['jquery',
         evt.preventDefault();
         var jsonData = {
             "referenceQuoteId": window.checkoutConfig.quoteItemData[0].quote_id,
-            "ipaddress":"<?php /* @escapeNotVerified */echo $block->getVisitorIp(); ?>"
+            "ipaddress":"<?php echo $block->escapeHtml($block->getVisitorIp()); ?>"
         };
         $.ajax({
             showLoader: true,
@@ -27,7 +27,7 @@ require(['jquery',
 });
 </script>
   <button id="payapi-instantbutton" class="action primary checkout">
-    <span><?php /* @escapeNotVerified */echo __('Instant Buy') ?></span>
+    <span><?php echo $block->escapeHtml(__('Instant Buy')) ?></span>
 </button>
 <?php }?>
 </div>
