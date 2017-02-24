@@ -60,6 +60,10 @@ class PayapiCallback implements PayapiCallbackInterface
                     //Payment failure
                     $order_id = $this->helper->changeStatus($orderId, "canceled", "canceled", "failed");
                     $result   = json_encode(['order_id' => $order_id]);
+                } elseif ($jsonData->payment->status == 'cancelled') {
+                    //Payment failure
+                    $order_id = $this->helper->changeStatus($orderId, "canceled", "canceled", "cancelled");
+                    $result   = json_encode(['order_id' => $order_id]);                    
                 } elseif ($jsonData->payment->status == 'chargeback') {
                     $order_id = $this->helper->changeStatus(
                         $orderId,
