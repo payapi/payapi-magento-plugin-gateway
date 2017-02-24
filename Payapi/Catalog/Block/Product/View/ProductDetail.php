@@ -11,14 +11,18 @@ class ProductDetail extends AbstractProduct
         \Payapi\Catalog\Block\InstantBuyBlock $instantBuyBlock,
         \Payapi\CheckoutPayment\Helper\SecureFormHelper $secureFormHelper,
         \Payapi\CheckoutPayment\Logger\Logger $logger,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository,
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->instantBuyBlock  = $instantBuyBlock;
-        $this->secureFormHelper = $secureFormHelper;
-        $this->secureformData   = false;
-        $this->visitorIp        = "";
-        $this->logger = $logger;
+        $this->instantBuyBlock     = $instantBuyBlock;
+        $this->secureFormHelper    = $secureFormHelper;
+        $this->secureformData      = false;
+        $this->visitorIp           = "";
+        $this->messageManager      = $messageManager;
+        $this->stockItemRepository = $stockItemRepository;
+        $this->logger              = $logger;
     }
 
     public function checkPayApiConfiguration()
@@ -29,7 +33,7 @@ class ProductDetail extends AbstractProduct
             //Just generate metas if invoker has different domain
             $this->logger->debug("checkPayApiConfiguration 2");
             $clientIp = $this->instantBuyBlock->getVisitorIp(false);
-            $this->logger->debug($this->visitorIp . " --- ".$clientIp);
+            $this->logger->debug($this->visitorIp . " --- " . $clientIp);
             if ($this->visitorIp != $clientIp) {
                 $param = ['qty' => $this->getQty()];
                 $opts  = $this->getMandatoryValues();
@@ -41,6 +45,15 @@ class ProductDetail extends AbstractProduct
                     $param,
                     $this->visitorIp
                 );
+            } else {
+                if ($this->instantBuyBlock->getIsInstantBuyEnabled()
+                    && $this->getRequest()->getQueryValue('fngr')) {
+                    if ($this->checkMandatoryFields()) {
+                        $this->messageManager->addNotice(__('Please specify product option(s).'));
+                    }
+                    $this->generateStockMessages();
+                }
+
             }
             return true;
         }
@@ -96,7 +109,7 @@ class ProductDetail extends AbstractProduct
     }
 
     public function getExtraData()
-    { 
+    {
         if ($this->getSecureFormData()) {
             return 'quote=' . $this->getSecureFormData()->order->referenceId;
         }
@@ -110,6 +123,53 @@ class ProductDetail extends AbstractProduct
 
     public function getStockItem()
     {
-        return $this->stockItemRepository->get($this->getProduct()->getId());
+        if (!isset($this->stockItem)) {
+            $this->stockItem = $this->stockItemRepository->get($this->getProduct()->getId());
+        }
+        return $this->stockItem;
     }
+
+    public function generateStockMessages()
+    {
+        $index = -1;
+
+        $stockItem = $this->getStockItem();
+        $curQty    = $this->getQty();
+
+        if ($curQty > $stockItem->getQty()) {
+            $index = 0;
+        }
+        if ($curQty < $stockItem->getMinSaleQty()) {
+            $index = 1;
+        } else if ($curQty > $stockItem->getMaxSaleQty()) {
+            $index = 2;
+        }
+
+        $msg = $this->getStockMessage($index);
+        if ($msg != '') {
+            $this->messageManager->addError($msg);
+            return true;
+        }
+        return false;
+    }
+
+    public function getStockMessage($index)
+    {
+        $message = '';
+        switch ($index) {
+            case 0:
+                $message = __('We don\'t have as many "%1" as you requested.', $this->getProduct()->getName());
+                break;
+            case 1:
+                $message = __("The fewest you may purchase is %1.", $this->getStockItem()->getMinSaleQty());
+                break;
+            case 2:
+                $message = __("The most you may purchase is %1.", $this->getStockItem()->getMaxSaleQty());
+                break;
+            default:
+                break;
+        }
+        return $message;
+    }
+
 }

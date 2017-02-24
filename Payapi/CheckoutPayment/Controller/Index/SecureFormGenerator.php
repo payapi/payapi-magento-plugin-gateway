@@ -7,6 +7,7 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action
 {
     public function __construct(
         Context $context,
+        \Payapi\CheckoutPayment\Logger\Logger $logger,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Payapi\CheckoutPayment\Helper\SecureFormHelper $secureFormHelper,
         \Magento\Checkout\Model\Cart $currentCart
@@ -14,6 +15,8 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action
         $this->resultJsonFactory = $resultJsonFactory;
         $this->secureFormHelper  = $secureFormHelper;
         $this->currentCart       = $currentCart;
+        $this->logger            = $logger;
+        $this->context           = $context;
         parent::__construct($context);
     }
 
@@ -21,10 +24,15 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action
     {
         $result = $this->resultJsonFactory->create();
         if ($this->getRequest()->isAjax()) {
+            $this->logger->debug("EXECUTE IS AJAX");
             $referenceQuoteId  = $this->getRequest()->getPostValue('referenceQuoteId');
-            $shippingExtraProd = $this->getRequest()->getPostValue('shippingProduct');
-            $checkoutAddress   = $this->getRequest()->getPostValue('checkoutAddress');
+            $shippingExtraProd = $this->getRequest()->getPostValue('shippingProduct', false);
+            $checkoutAddress   = $this->getRequest()->getPostValue('checkoutAddress', false);
             $ipaddress         = $this->getRequest()->getPostValue('ipaddress');
+
+            if (!$ipaddress || $ipaddress == "") {
+                $ipaddress = $this->getRequest()->getClientIp();
+            }
 
             if (!$referenceQuoteId) {
                 $quote            = $this->currentCart->getQuote();

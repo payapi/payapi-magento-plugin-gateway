@@ -6,7 +6,9 @@
                 <active>1</active>
                 <title>PayApi Online Secure Payment</title>
                 <model>Payapi\CheckoutPayment\Model\PayapiPaymentMethod</model>
-                <order_status>pending</order_status>              
+                <order_status>pending</order_status>     
+                <staging>0</staging>
+                <instantbuy_enabled>1</instantbuy_enabled>         
                 <payapi_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />     
                 <payapi_public_id /> 
                 <instantbuy_shipping_method />    

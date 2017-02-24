@@ -1,9 +1,9 @@
 
 <div>
-<?php if ($block->checkPayApiConfiguration()) {
-    ?>
+<?php if ($block->checkPayApiConfiguration() && $block->getInstantBuyBlock()->getIsInstantBuyEnabled()) { ?>  
 
   <script>
+
   var _payapi = {
     checkMandatory: function _checkMandatory(url,silencePopup,msg){
         var $toCartForm = $("#product_addtocart_form");
@@ -16,6 +16,33 @@
         }
         //Add product options to the currUrl
         var opts = decodeURIComponent($toCartForm.find(":input:not(:hidden)").serialize());
+        var stockVals = "<?php echo $block->getStockItem()->getQty() . ","
+    . $block->getStockItem()->getMinSaleQty() . ","
+    . $block->getStockItem()->getMaxSaleQty();
+    ?>".split(",").map(Number);
+
+        var curQty = $("#qty").attr("value");
+        var $messages = $(".page.messages");
+        if (curQty > stockVals[0]) {
+            $messages.empty();
+            var msg = "<?php echo $block->escapeHtml($block->getStockMessage(0)); ?>";
+            $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
+            alert($(".message-error").text());
+            return '';
+        }
+        if (curQty < stockVals[1]) {
+            $messages.empty();
+            var msg = "<?php echo $block->escapeHtml($block->getStockMessage(1)); ?>";
+            $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
+            alert($(".message-error").text());
+            return '';
+        } else if (curQty > stockVals[2]) {
+            $messages.empty();
+            var msg = "<?php echo $block->escapeHtml($block->getStockMessage(2)); ?>";
+            $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
+            alert($(".message-error").text());
+            return '';
+        }
 
         var productUrl = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
         if (url.indexOf("payapiwebshop=1") > 0) {
@@ -31,7 +58,7 @@
   };
 
   require(['jquery','mage/translate'],function($){
-        console.log("inicio payapi 4");
+        $(".fngrsharesdk-container").addClass("fngrsharesdk-productpage");
         var msg = $.mage.__("Please fill in all of the required fields");
 
         var currUrl = window.location.href;

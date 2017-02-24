@@ -2,8 +2,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
 
 <body>    
-    <referenceContainer name="page.wrapper" htmlClass="fngrsharesdk-container fngrsharesdk-productpage">
-    </referenceContainer>
     <referenceContainer name="product.info.addtocart">
         <block class="Payapi\Catalog\Block\Product\View\ProductDetail"
             name="product.view.instantbuy"

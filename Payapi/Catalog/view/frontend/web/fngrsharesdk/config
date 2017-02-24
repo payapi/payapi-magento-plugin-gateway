@@ -3,7 +3,7 @@
 	"sharedVia": "",
 	"featureEnablePurchases": true,
 	"featureEnableProductImageIcons": true,
-	"featureEnableAddToShoppingCart": false,
+	"featureEnableAddToShoppingCart": true,
 	"shareCircleWhitelist":{		
 		"mobile": [],
 		"desktop": []

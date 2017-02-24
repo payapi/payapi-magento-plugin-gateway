@@ -21,7 +21,7 @@
                                                                     <item name="component" xsi:type="string">Payapi_CheckoutPayment/js/view/payment/method-renderer</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="payapi_checkoutpayment_secure_form_post" xsi:type="array">
-                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">false</item>
                                                                         </item>
                                                                     </item>
                                                                 </item>

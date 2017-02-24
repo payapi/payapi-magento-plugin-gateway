@@ -1,6 +1,6 @@
 
 <div>
-<?php if ($block->checkPayApiConfiguration()) {?>
+<?php if ($block->checkPayApiConfiguration() && $block->getIsInstantBuyEnabled()) {?>
 <script>
 require(['jquery',
         'payapiSdk'],function($){
@@ -19,7 +19,8 @@ require(['jquery',
             data: jsonData,
             success: function(data){
                 payapiSdk.configure(window.checkoutConfig.payment.customPayment.payapi_public_id,
-                                     window.checkoutConfig.payment.customPayment.payapi_api_key);
+                                     window.checkoutConfig.payment.customPayment.payapi_api_key,
+                                     window.checkoutConfig.payment.customPayment.payapi_is_staging);
                 payapiSdk.postData(data);
             }
         });

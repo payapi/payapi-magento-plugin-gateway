@@ -22,6 +22,8 @@ class InstantBuyBlock extends \Magento\Framework\View\Element\Template
         $this->payapiApiKey              = $paymentMethod->getConfigData('payapi_api_key');
         $this->payapiPublicId            = $paymentMethod->getConfigData('payapi_public_id');
         $this->instantBuyDefaultShipping = $paymentMethod->getConfigData('instantbuy_shipping_method');
+        $this->isInstantBuyEnabled       = $paymentMethod->getConfigData('instantbuy_enabled');
+        $this->isStaging                 = $paymentMethod->getConfigData('staging');
 
         return isset($this->payapiPublicId) && isset($this->payapiApiKey) && isset($this->instantBuyDefaultShipping) && is_string($this->instantBuyDefaultShipping) && strlen($this->instantBuyDefaultShipping) > 0;
     }
@@ -36,13 +38,22 @@ class InstantBuyBlock extends \Magento\Framework\View\Element\Template
         return $this->payapiApiKey;
     }
 
+    public function getIsInstantBuyEnabled(){
+        return $this->isInstantBuyEnabled;
+    }
+
+    public function getIsStaging()
+    {
+        return $this->isStaging;
+    }
+
     public function getVisitorIp($checkParams = true)
     {
         $ipaddress = '';
         $paramIp   = $this->getRequest()->getQueryValue('ip');
         if ($checkParams && $paramIp) {
             return $paramIp;
-        } else { 
+        } else {
             $ipaddress = $this->getRequest()->getClientIp();
         }
         return $ipaddress;

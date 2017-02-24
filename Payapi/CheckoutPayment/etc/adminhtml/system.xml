@@ -30,6 +30,14 @@
                     <label>PayApi Api Key</label>
                     <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
+                <field id="staging" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Staging</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="instantbuy_enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Instant Buy</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
                 <field id="instantbuy_shipping_method" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Default shipping method for Instant Buy</label>
                     <source_model>Payapi\CheckoutPayment\Model\Config\AllActiveShippingMethods</source_model>

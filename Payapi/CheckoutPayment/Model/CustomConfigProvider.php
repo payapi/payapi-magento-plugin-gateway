@@ -29,6 +29,7 @@ class CustomConfigProvider implements ConfigProviderInterface
                 'customPayment' => [
                     'payapi_api_key'   => $this->paymentMethod->getConfigData('payapi_api_key'),
                     'payapi_public_id' => $this->paymentMethod->getConfigData('payapi_public_id'),
+                    'payapi_is_staging' => $this->paymentMethod->getConfigData('staging')
                 ],
             ],
         ];

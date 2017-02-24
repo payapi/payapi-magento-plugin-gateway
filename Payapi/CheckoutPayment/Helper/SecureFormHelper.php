@@ -32,6 +32,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->curl                    = $curl;
         $this->objectFactory           = $objectFactory;
         $this->customerSession         = $currentCart->getCustomerSession();
+        $this->scopeConfig             = $context->getScopeConfig();
 
         $paymentMethod               = $paymentHelper->getMethodInstance("payapi_checkoutpayment_secure_form_post");
         $this->defaultShippingMethod = $paymentMethod->getConfigData('instantbuy_shipping_method');
@@ -44,7 +45,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $checkoutAddress = false,
         $ipaddress = ""
     ) {
-
+        $this->logger->debug("POST SECURE FORM");
         $cart_id        = $this->cartManagementInterface->createEmptyCart();
         $referenceQuote = $this->cartRepositoryInterface->get($referenceQuoteId);
         $newQuote       = $this->cartRepositoryInterface->get($cart_id);
@@ -89,6 +90,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     private function completeQuoteAndGetData($quote, $shippingExtraProd, $checkoutAddress = false, $ipaddress = "")
     {
+        $this->logger->debug("completeQuoteAndGetData");
         $quote->setStore($this->store);
         $quote->setCurrency();
 
@@ -110,37 +112,46 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         //3. use ip country
         //4. use store country
         if ($checkoutAddress) {
+            $this->logger->debug("param Address");
             $finalAddr = $checkoutAddress;
         } elseif ($userAddress) {
+            $this->logger->debug("user Address");
             $finalAddr = $userAddress;
         } else {
+            $this->logger->debug("ipAddress");
             $finalAddr = $this->getShippingFromIp($ipaddress);
             if (!isset($finalAddr) || $finalAddr == null) {
-                $countryCode = $this->context->getScopeConfig()->getValue('general/store_information/country_id');
-                $region      = $this->context->getScopeConfig()->getValue('general/store_information/region');
+                $this->logger->debug("store Country");
+                $countryCode = $this->scopeConfig->getValue('general/store_information/country_id');
+                $region      = $this->scopeConfig->getValue('general/store_information/region_id');
                 $finalAddr   = [
                     'firstname'            => 'xxxxx', //address Details
                     'lastname'             => 'xxxxx',
                     'street'               => 'xxxxx',
                     'city'                 => 'xxxxx',
                     'country_id'           => $countryCode,
-                    'region'               => $region,
+                    'region_id'            => $region,
                     'postcode'             => '*',
                     'telephone'            => '0',
                     'fax'                  => '0',
                     'save_in_address_book' => 0,
                 ];
+
             }
         }
+
+        $this->logger->debug("after final address");
 
         $quote->getBillingAddress()->addData($finalAddr);
         $quote->getShippingAddress()->addData($finalAddr);
 
+        $this->logger->debug("after add data");
         // Shipping method
         $shippingMethod = $this->defaultShippingMethod;
         if ($shippingExtraProd) {
             $shippingMethod = $shippingExtraProd["id"];
         }
+        $this->logger->debug("shippingMethod");
 
         $shippingRate = $this->shippingRate;
         $shippingRate
@@ -163,24 +174,14 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     private function getSecureFormData($quoteTmp, $shippingAddress = [], $shippingExtraProd = false)
     {
+        $this->logger->debug("getSecureFormData");
 
-        $totals = $quoteTmp->getShippingAddress()->getData();
-
-        $baseExclTax    = $totals['base_subtotal_with_discount'];
-        $taxAmount      = $totals['tax_amount'];
-        $shippingAmount = $totals['shipping_amount'];
-        $totalOrdered   = $totals['base_grand_total'];
-
-        $order = ["sumInCentsIncVat" => round($totalOrdered * 100),
-            "sumInCentsExcVat"           => round(($baseExclTax + $shippingAmount) * 100),
-            "vatInCents"                 => round($taxAmount * 100),
-            "currency"                   => $this->store->getCurrentCurrencyCode(),
-            "referenceId"                => $quoteTmp->getId()];
-
-        $items    = $quoteTmp->getAllItems();
-        $products = [];
+        $items     = $quoteTmp->getAllItems();
+        $products  = [];
+        $isVirtual = true;
         if ($items) {
             foreach ($items as $item) {
+                $isVirtual = $isVirtual && $item->getIsVirtual();
                 $qty        = $item->getQty();
                 $products[] = [
                     "id"                 => $item->getProductId(),
@@ -195,6 +196,25 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
                 ];
             }
         }
+        
+        if (! $isVirtual) {
+            $this->logger->debug("NOT Virtual");
+            $totals = $quoteTmp->getShippingAddress()->getData();            
+        }else{
+            $this->logger->debug("isVirtual");
+            $totals = $quoteTmp->getBillingAddress()->getData();
+        }
+
+        $baseExclTax    = $totals['base_subtotal_with_discount'];
+        $taxAmount      = $totals['tax_amount'];
+        $shippingAmount = $totals['shipping_amount'];
+        $totalOrdered   = $totals['base_grand_total'];
+
+        $order = ["sumInCentsIncVat" => round($totalOrdered * 100),
+            "sumInCentsExcVat"           => round(($baseExclTax + $shippingAmount) * 100),
+            "vatInCents"                 => round($taxAmount * 100),
+            "currency"                   => $this->store->getCurrentCurrencyCode(),
+            "referenceId"                => $quoteTmp->getId()];
 
         $shipIncTax = $totals['base_shipping_incl_tax'];
         $shipVat    = $totals['base_shipping_tax_amount'];
@@ -226,7 +246,23 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         } else {
             $consumer = ["locale" => $locale, "email" => ""];
         }
+        if ($shippingAddress && !empty($shippingAddress)) {
 
+            $payapiShipping = [
+                "countryCode" => $shippingAddress['country_id'],
+            ];
+
+            if (isset($shippingAddress["firstname"]) && $shippingAddress["firstname"] != 'xxxxx') {
+                $payapiShipping["recipientName"] = $shippingAddress['firstname'] . ' ' . $shippingAddress['lastname'];
+                $payapiShipping["streetAddress"] = $shippingAddress['street'];
+                $payapiShipping["postalCode"]    = $shippingAddress['postcode'];
+                $payapiShipping["city"]          = $shippingAddress['city'];
+                if (isset($shippingAddress["region"])) {
+                    $payapiShipping["stateOrProvince"] = $shippingAddress['region'];
+                }
+
+            }
+        }
         //Return URLs
 
         $returnUrls = [
@@ -243,12 +279,15 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             "chargeback" => $callbackUrl,
         ];
 
-        $res = ["order"   => $order,
-            "products"        => $products,
-            "consumer"        => $consumer,
-            "shippingAddress" => $shippingAddress,
-            "returnUrls"      => $returnUrls,
-            "callbacks"       => $jsonCallbacks];
+        $res = ["order" => $order,
+            "products"      => $products,
+            "consumer"      => $consumer,
+            "returnUrls"    => $returnUrls,
+            "callbacks"     => $jsonCallbacks];
+
+        if (isset($payapiShipping)) {
+            $res["shippingAddress"] = $payapiShipping;
+        }
 
         $this->logger->debug(json_encode($res));
         return $res;
