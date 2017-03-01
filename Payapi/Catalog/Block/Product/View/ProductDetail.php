@@ -37,9 +37,14 @@ class ProductDetail extends AbstractProduct
             if ($this->visitorIp != $clientIp) {
                 $param = ['qty' => $this->getQty()];
                 $opts  = $this->getMandatoryValues();
+                $superAttrs = $this->getSuperAttributes();
                 if (!empty($opts)) {
                     $param['options'] = $opts;
                 }
+                if(!empty($superAttrs)) {
+                    $param['super_attribute'] = $superAttrs;
+                }
+
                 $this->secureformData = $this->secureFormHelper->getInstantBuySecureForm(
                     $this->getProduct()->getId(),
                     $param,
@@ -50,8 +55,8 @@ class ProductDetail extends AbstractProduct
                     && $this->getRequest()->getQueryValue('fngr')) {
                     if ($this->checkMandatoryFields()) {
                         $this->messageManager->addNotice(__('Please specify product option(s).'));
-                    }
-                    $this->generateStockMessages();
+                        $this->generateStockMessages();
+                    }                    
                 }
 
             }
@@ -68,6 +73,15 @@ class ProductDetail extends AbstractProduct
         }
 
         return 1;
+    }
+
+    public function getSuperAttributes(){
+        $val = $this->getRequest()->getQueryValue('super_attribute');
+        if ($val) {
+            return $val;
+        }
+
+        return [];
     }
 
     public function getMandatoryValues()
@@ -153,7 +167,7 @@ class ProductDetail extends AbstractProduct
         return false;
     }
 
-    public function getStockMessage($index)
+    public function getStockMessage($index, $withValues = true)
     {
         $message = '';
         switch ($index) {
@@ -161,15 +175,62 @@ class ProductDetail extends AbstractProduct
                 $message = __('We don\'t have as many "%1" as you requested.', $this->getProduct()->getName());
                 break;
             case 1:
-                $message = __("The fewest you may purchase is %1.", $this->getStockItem()->getMinSaleQty());
+                if ($withValues) {
+                    $message = __("The fewest you may purchase is %1.", $this->getStockItem()->getMinSaleQty());
+                } else {
+                    $message = __("The fewest you may purchase is %1.");
+                }
                 break;
             case 2:
-                $message = __("The most you may purchase is %1.", $this->getStockItem()->getMaxSaleQty());
+                if ($withValues) {
+                    $message = __("The most you may purchase is %1.", $this->getStockItem()->getMaxSaleQty());
+                } else {
+                    $message = __("The most you may purchase is %1.");
+                }
                 break;
+
             default:
                 break;
         }
         return $message;
     }
 
+    public function getStockForConfigurableProduct()
+    {
+        $resul   = [];
+        $product = $this->getProduct();
+        if ($product->getTypeId() == \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+            //Is a configurable product with subproducts
+
+            $this->logger->debug("IS Configurable PRODUCT");
+            $keys      = [];
+            $usedProds = $product->getTypeInstance()->getUsedProducts($product);
+            foreach ($product->getTypeInstance()->getConfigurableAttributesAsArray($product) as $it) {
+                $keys[] = $it["attribute_id"];
+            }
+
+            $resul["order"] = $keys;
+            $resul["attrs"] = [];
+
+            foreach ($usedProds as $simple) {
+                $strAtrs = "";
+                foreach ($keys as $k) {
+                    $atr   = $product->getResource()->getAttribute($k);
+                    $myval = $atr->getFrontend()->getValue($simple);
+                    if ($atr->usesSource()) {
+                        $myval = $atr->getSource()->getOptionId($myval);
+                    }
+                    $strAtrs = $strAtrs . $atr->getAttributeId() . ":" . $myval . "&";
+                }
+                $stockItem                = $this->stockItemRepository->get($simple->getId());
+                $resul["attrs"][$strAtrs] = [($stockItem->getQty()) ? $stockItem->getQty() : 0,
+                    $stockItem->getMinSaleQty(),
+                    $stockItem->getMaxSaleQty(),
+                ];
+            }
+        }
+        $strResul = json_encode($resul);
+        $this->logger->debug($strResul);
+        return $strResul;
+    }
 }

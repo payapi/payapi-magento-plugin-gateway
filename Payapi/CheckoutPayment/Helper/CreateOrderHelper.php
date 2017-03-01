@@ -48,31 +48,51 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
     public function addPayment($orderId)
     {
         $this->customlogger->debug("Adding payment to order " . $orderId);
-        $order = $this->orderRepository->get($orderId);
+        $isHolded = false;
+        $order    = $this->orderRepository->get($orderId);
+        if ($order && $order->getState() == "holded") {
+            $this->customlogger->debug("Was holded ");
+            $order->setState("new")->setStatus("pending");
+            $isHolded = true;
+            $order->save();
+        }
         if ($order && $order->canInvoice()) {
+
+            $this->customlogger->debug("after holded ");
             $invoice = $this->invoiceService->prepareInvoice($order);
             $invoice->register();
+            $this->customlogger->debug("after register ");
             $invoice->save();
+            $this->customlogger->debug("after save ");
             $transactionSave = $this->transaction->addObject(
                 $invoice
             )->addObject(
                 $invoice->getOrder()
             );
+            $this->customlogger->debug("after addobject ");
             $transactionSave->save();
+            $this->customlogger->debug("after save 2");
             $this->invoiceSender->send($invoice);
+            $this->customlogger->debug("after send ");
             //send notification code
-            if ($order->getState() !== "holded") {
-                $this->changeStatus($orderId, "processing", "processing", "success");
-            } else {
-                $msg = __("Payment %1 event received. ", "success");
-                $order->addStatusHistoryComment($msg);
-            }
-
+            
             $order->addStatusHistoryComment(
                 __('Notified customer about invoice #%1.', $invoice->getId())
             )
                 ->setIsCustomerNotified(true)
                 ->save();
+
+            if (!$isHolded) {
+                $this->changeStatus($orderId, "processing", "processing", "success");
+            } else {
+                $this->customlogger->debug("IS HOLDED");
+                $order->setState("holded")->setStatus("holded");
+                $this->customlogger->debug("after set status");
+                $msg = __("Payment %1 event received. ", "success");
+                $order->addStatusHistoryComment($msg);
+                $order->save();
+            }
+
             return $orderId;
         }
 
@@ -202,23 +222,33 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function checkStock($items)
     {
-        $result = [];
-        $i      = 0;
+        $result     = [];
+        $i          = 0;
+        $parentItem = false;
         foreach ($items as $item) {
-            $i++;
-            $stockObj = $this->stockItemRepository->get($item->getProductId());
-            if ($stockObj && $item->getQty() > $stockObj->getQty()) {
-                $original = $stockObj->getQty();
-                $newQty   = $item->getQty();
+            if ($item->getProduct()->getTypeId() != \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                $i++;
+                $qty = $item->getQty();
+                if ($parentItem) {
+                    $qty = $parentItem->getQty();
+                }
 
-                $this->setNewStock($item->getProduct(), $newQty);
-                $this->customlogger->debug("SAVED STOCK FOR " . $item->getProductId() . ":  " . $newQty);
-                $result[] = __(
-                    'Order item at line # %1 has a stock conflict. Original Qty in stock: # %2; Requested Qty: # %3',
-                    $i,
-                    $original,
-                    $newQty
-                );
+                $stockObj = $this->stockItemRepository->get($item->getProductId());
+                if ($stockObj && $qty > $stockObj->getQty()) {
+                    $original = $stockObj->getQty();
+                    $newQty   = $qty;
+
+                    $this->setNewStock($item->getProduct(), $newQty);
+                    $this->customlogger->debug("SAVED STOCK FOR " . $item->getProductId() . ":  " . $newQty);
+                    $result[] = __(
+                        'Order item at line # %1 has a stock conflict. Original Qty in stock: # %2; Requested Qty: # %3',
+                        $i,
+                        $original,
+                        $newQty
+                    );
+                }
+            } else {
+                $parentItem = $item;
             }
         }
 

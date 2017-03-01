@@ -74,7 +74,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         if ($product) {
             $quoteId = $this->cartManagementInterface->createEmptyCart();
             $quote   = $this->cartRepositoryInterface->get($quoteId);
-
+            $this->logger->debug(json_encode($opts));
             $optsObj = $this->objectFactory->create($opts);
             $quote->addProduct(
                 $product,
@@ -180,20 +180,27 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $products  = [];
         $isVirtual = true;
         if ($items) {
+            $parentItem = false;
             foreach ($items as $item) {
                 $isVirtual = $isVirtual && $item->getIsVirtual();
-                $qty        = $item->getQty();
+                
+                if($item->getProduct()->getTypeId() == \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                    $parentItem = $item;
+                }else{
+                $qty        = ($parentItem) ? $parentItem->getQty() : $item->getQty();
                 $products[] = [
                     "id"                 => $item->getProductId(),
                     "quantity"           => $qty,
                     "title"              => $item->getName(),
-                    "priceInCentsIncVat" => round($item['row_total_incl_tax'] * 100 / $qty),
-                    "priceInCentsExcVat" => round($item['row_total'] * 100 / $qty),
-                    "vatInCents"         => round($item['tax_amount'] * 100 / $qty),
-                    "vatPercentage"      => $item['tax_percent'],
+                    "priceInCentsIncVat" => round((($parentItem) ? $parentItem['row_total_incl_tax'] : $item['row_total_incl_tax']) * 100 / $qty),
+                    "priceInCentsExcVat" => round((($parentItem) ? $parentItem['row_total'] : $item['row_total']) * 100 / $qty),
+                    "vatInCents"         => round((($parentItem) ? $parentItem['tax_amount'] : $item['tax_amount']) * 100 / $qty),
+                    "vatPercentage"      => (($parentItem) ? $parentItem['tax_percent'] : $item['tax_percent']),
                     "imageUrl"           => $this->store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
-                    . 'catalog/product' . $item->getProduct()->getImage(),
-                ];
+                    . 'catalog/product' . (($parentItem) ? $parentItem : $item)->getProduct()->getImage(),
+                    ];
+                    $parentItem = false;
+                }
             }
         }
         
@@ -214,7 +221,8 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             "sumInCentsExcVat"           => round(($baseExclTax + $shippingAmount) * 100),
             "vatInCents"                 => round($taxAmount * 100),
             "currency"                   => $this->store->getCurrentCurrencyCode(),
-            "referenceId"                => $quoteTmp->getId()];
+            "referenceId"                => $quoteTmp->getId(), 
+            "tosUrl"                     => "https://magento.payapi.xyz/privacy-policy-cookie-restriction-mode"];
 
         $shipIncTax = $totals['base_shipping_incl_tax'];
         $shipVat    = $totals['base_shipping_tax_amount'];

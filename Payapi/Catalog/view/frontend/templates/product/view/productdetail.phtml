@@ -1,6 +1,7 @@
 
 <div>
-<?php if ($block->checkPayApiConfiguration() && $block->getInstantBuyBlock()->getIsInstantBuyEnabled()) { ?>  
+<?php if ($block->checkPayApiConfiguration() && $block->getInstantBuyBlock()->getIsInstantBuyEnabled()) {
+    ?>
 
   <script>
 
@@ -16,33 +17,59 @@
         }
         //Add product options to the currUrl
         var opts = decodeURIComponent($toCartForm.find(":input:not(:hidden)").serialize());
-        var stockVals = "<?php echo $block->getStockItem()->getQty() . ","
-    . $block->getStockItem()->getMinSaleQty() . ","
-    . $block->getStockItem()->getMaxSaleQty();
-    ?>".split(",").map(Number);
+        var configurableProdStock = <?php echo $block->getStockForConfigurableProduct() ?>;
+        console.log(JSON.stringify(configurableProdStock));
+        var stockVals = "1,2,3";
+        if ("order" in configurableProdStock) {
 
-        var curQty = $("#qty").attr("value");
-        var $messages = $(".page.messages");
-        if (curQty > stockVals[0]) {
-            $messages.empty();
-            var msg = "<?php echo $block->escapeHtml($block->getStockMessage(0)); ?>";
-            $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
-            alert($(".message-error").text());
-            return '';
-        }
-        if (curQty < stockVals[1]) {
-            $messages.empty();
-            var msg = "<?php echo $block->escapeHtml($block->getStockMessage(1)); ?>";
-            $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
-            alert($(".message-error").text());
-            return '';
-        } else if (curQty > stockVals[2]) {
-            $messages.empty();
-            var msg = "<?php echo $block->escapeHtml($block->getStockMessage(2)); ?>";
-            $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
-            alert($(".message-error").text());
-            return '';
-        }
+          var attrsForm = $toCartForm.find(":input.super-attribute-select").serializeArray();
+          var auxAttrs = [];
+          attrsForm.forEach (function(item){
+            auxAttrs[item.name] = item.value;
+          });          
+          attrsForm = auxAttrs;          
+          console.log(JSON.stringify(attrsForm));
+
+          var strStockVals = "";
+
+          configurableProdStock.order.forEach (function(optionId){
+            strStockVals = strStockVals + optionId+":"+ attrsForm["super_attribute["+ optionId +"]"] + "&";
+          });
+
+          stockVals = configurableProdStock.attrs[strStockVals];
+        }else{
+          stockVals = "<?php echo $block->getStockItem()->getQty() . ","
+    . $block->getStockItem()->getMinSaleQty() . ","
+    . $block->getStockItem()->getMaxSaleQty(); ?>".split(",").map(Number);
+
+      }
+
+          var curQty = $("#qty").attr("value");
+          var $messages = $(".page.messages");
+          if (curQty > stockVals[0]) {
+              $messages.empty();
+              var msg = "<?php echo $block->escapeHtml($block->getStockMessage(0)); ?>";
+              $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
+              alert($(".message-error").text());
+              return '';
+          }
+          if (curQty < stockVals[1]) {
+              $messages.empty();
+              var msg = "<?php echo $block->escapeHtml($block->getStockMessage(1, false)); ?>";
+              msg = msg.replace("%1", stockVals[1]);
+              $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
+              alert($(".message-error").text());
+              return '';
+          } else if (curQty > stockVals[2]) {
+              $messages.empty();
+              var msg = "<?php echo $block->escapeHtml($block->getStockMessage(2, false)); ?>";
+              msg = msg.replace("%1", stockVals[2]);
+              $messages.prepend("<div class='message-error error message'>"+msg+"</div>");
+              alert($(".message-error").text());
+              return '';
+          }
+
+
 
         var productUrl = 'https://input.payapi.io/v1/webshop/'+ encodeURIComponent(url+"&"+opts);
         if (url.indexOf("payapiwebshop=1") > 0) {
@@ -90,6 +117,8 @@ echo $block->escapeHtml($block->getSecureFormData()->order->currency); ?>">
 echo $block->escapeHtml($block->getSecureFormData()->products[1]->priceInCentsExcVat); ?>">
 <meta name="order.shippingHandlingFeeInCentsIncVat" content="<?php
 echo $block->escapeHtml($block->getSecureFormData()->products[1]->priceInCentsIncVat); ?>">
+<meta name="order.tosUrl" content="<?php
+echo $block->escapeHtml($block->getSecureFormData()->order->tosUrl); ?>">
 <meta name="product.id" content="<?php
 echo $block->escapeHtml($block->getSecureFormData()->products[0]->id); ?>">
 <meta name="product.quantity" content="<?php
