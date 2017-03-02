@@ -23,7 +23,7 @@
         "magento/module-ui": "100.2.*",
         "magento/module-vault": "100.2.*",
         "lib-libxml": "*",
-        "firebase/php-jwt": "~2.2.0"
+        "firebase/php-jwt": "^4.0"
     },
     "authors": [{
         "name": "Francisco Nieto Zamora",
