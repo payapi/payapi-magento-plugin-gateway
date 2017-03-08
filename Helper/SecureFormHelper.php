@@ -247,7 +247,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $products[] = $shippingExtraProd;
 
         //Consumer
-        $locale = $this->resolver->getLocale();
+        $locale = str_replace("_", "-", $this->resolver->getLocale());
         $email  = $quoteTmp->getCustomerEmail();
         if ($email) {
             $consumer = ["locale" => $locale, "email" => $email];
