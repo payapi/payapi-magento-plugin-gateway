@@ -39,6 +39,14 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action
                 $referenceQuoteId = $quote->getId();
             }
 
+            if ($shippingExtraProd) {
+                $shippingExtraProd["quantity"] = intval($shippingExtraProd["quantity"]);
+                $shippingExtraProd["priceInCentsIncVat"] = intval($shippingExtraProd["priceInCentsIncVat"]);
+                $shippingExtraProd["priceInCentsExcVat"] = intval($shippingExtraProd["priceInCentsExcVat"]);
+                $shippingExtraProd["vatInCents"] = intval($shippingExtraProd["vatInCents"]);
+                $shippingExtraProd["vatPercentage"] = floatval($shippingExtraProd["vatPercentage"]);
+            }
+
             $secureformObject = $this->secureFormHelper->postSecureForm(
                 $referenceQuoteId,
                 $shippingExtraProd,

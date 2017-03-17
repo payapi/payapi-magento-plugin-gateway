@@ -4,7 +4,6 @@ define(
     [
         'jquery',
         'Magento_Checkout/js/view/payment/default',
-        'Magento_Paypal/js/action/set-payment-method',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/model/quote',
         'Magento_Customer/js/customer-data',
@@ -14,7 +13,6 @@ define(
     function (
         $,
         Component,
-        setPaymentMethodAction,
         additionalValidators,
         quote,
         customerData,
@@ -29,14 +27,15 @@ define(
                 
             },
 
-
-            /** Redirect to paypal */
+            /** Redirect to payapi */
             continueToPayApi: function () {
                 if (additionalValidators.validate()) {
                     //update payment method information if additional data was changed
                     this.selectPaymentMethod();
-                    setPaymentMethodAction(this.messageContainer).done(
-                        function () {
+                    console.log("continueToPayApi: "+ quote.paymentMethod().method);
+                   /* setPaymentMethodAction(this.messageContainer).done(
+                        function () {*/
+                            console.log("setPaymentMethodAction DONE");
                             customerData.invalidate(['cart']);
                             var order = quote.totals();
                             var quoteId = window.checkoutConfig.quoteItemData[0].quote_id;
@@ -98,13 +97,13 @@ define(
                                 success: function (data) {
                                     payapiSdk.configure(window.checkoutConfig.payment.customPayment.payapi_public_id, 
                                         window.checkoutConfig.payment.customPayment.payapi_api_key,
-                                        window.checkoutConfig.payment.customPayment.payapi_is_staging);
+                                        window.checkoutConfig.payment.customPayment.payapi_is_staging == "1");
                                     payapiSdk.postData(data);
                                 }
                                 }
                             );
-                        }
-                    );
+                       /* }
+                    );*/
 
                     return false;
                 }
