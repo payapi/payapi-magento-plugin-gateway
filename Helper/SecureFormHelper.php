@@ -49,7 +49,14 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $cart_id        = $this->cartManagementInterface->createEmptyCart();
         $referenceQuote = $this->cartRepositoryInterface->get($referenceQuoteId);
         $newQuote       = $this->cartRepositoryInterface->get($cart_id);
-        $newQuote       = $newQuote->merge($referenceQuote);
+        foreach ($referenceQuote->getAllVisibleItems() as $item) {
+            $newItem = clone $item;
+            $newQuote->addItem($newItem);
+        }
+
+        if ($referenceQuote->getCouponCode()) {
+            $newQuote->setCouponCode($referenceQuote->getCouponCode());
+        }
 
         $secureformData = $this->completeQuoteAndGetData($newQuote, $shippingExtraProd, $checkoutAddress, $ipaddress);
         return $secureformData;
@@ -180,34 +187,26 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $products  = [];
         $isVirtual = true;
         if ($items) {
-            $parentItem = false;
             foreach ($items as $item) {
                 $isVirtual = $isVirtual && $item->getIsVirtual();
-                
-                if($item->getProduct()->getTypeId() == \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
-                    $parentItem = $item;
-                }else{
-                $qty        = ($parentItem) ? $parentItem->getQty() : $item->getQty();
+                $qty        = $item->getQty();
                 $products[] = [
                     "id"                 => $item->getProductId(),
                     "quantity"           => $qty,
                     "title"              => $item->getName(),
-                    "priceInCentsIncVat" => round((($parentItem) ? $parentItem['row_total_incl_tax'] : $item['row_total_incl_tax']) * 100 / $qty),
-                    "priceInCentsExcVat" => round((($parentItem) ? $parentItem['row_total'] : $item['row_total']) * 100 / $qty),
-                    "vatInCents"         => round((($parentItem) ? $parentItem['tax_amount'] : $item['tax_amount']) * 100 / $qty),
-                    "vatPercentage"      => (($parentItem) ? $parentItem['tax_percent'] : $item['tax_percent']),
-                    "imageUrl"           => $this->store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA)
-                    . 'catalog/product' . (($parentItem) ? $parentItem : $item)->getProduct()->getImage(),
-                    ];
-                    $parentItem = false;
-                }
+                    "priceInCentsIncVat" => round($item['row_total_incl_tax'] * 100 / $qty),
+                    "priceInCentsExcVat" => round($item['row_total'] * 100 / $qty),
+                    "vatInCents"         => round($item['tax_amount'] * 100 / $qty),
+                    "vatPercentage"      => $item['tax_percent'],
+                    "imageUrl"           => $this->store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $item->getProduct()->getImage(),
+                ];
             }
         }
-        
-        if (! $isVirtual) {
+
+        if (!$isVirtual) {
             $this->logger->debug("NOT Virtual");
-            $totals = $quoteTmp->getShippingAddress()->getData();            
-        }else{
+            $totals = $quoteTmp->getShippingAddress()->getData();
+        } else {
             $this->logger->debug("isVirtual");
             $totals = $quoteTmp->getBillingAddress()->getData();
         }
