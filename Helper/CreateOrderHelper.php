@@ -139,35 +139,32 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $extra           = $payapiObject->products[0]->extraData;
         $merchantComment = "";
         if (isset($payapiObject->extraInputData)
-            && isset($payapiObject->extraInputData->messageToMerchant)) {
-            $merchantComment = $payapiObject->extraInputData->messageToMerchant;
+            && !empty($payapiObject->extraInputData)) {
+            foreach ($payapiObject->extraInputData as $key => $value) {
+                $merchantComment = $merchantComment . $key .": " . $value."\n";
+            }
         }
 
         $arr = explode('=', $extra);
         if (isset($arr) && count($arr) > 1 && $arr[0] == 'quote') {
             //WEBSHOP/INSTANT BUY
-            $quoteId            = (int) ($arr[1]);
-            $this->quote        = $this->quoteRepository->get($quoteId);
-            $this->stockChanges = $this->checkStock($this->quote->getAllItems());
-            return $this->saveOrder(
+            $quoteId            = (int) ($arr[1]);            
+        } else {
+            //POST
+            $quoteId            = (int) ($payapiObject->order->referenceId);            
+        }
+
+        $this->quote        = $this->quoteRepository->get($quoteId);
+        $this->stockChanges = $this->checkStock($this->quote->getAllItems());
+        return $this->saveOrder(
                 $this->quote,
                 $payapiObject->consumer->email,
                 $this->getShippingAddress($payapiObject),
                 $merchantComment
             );
-
-            //Update shipping address
-        } else {
-            //POST
-            $quoteId            = (int) ($payapiObject->order->referenceId);
-            $this->quote        = $this->quoteRepository->get($quoteId);
-            $this->stockChanges = $this->checkStock($this->quote->getAllItems());
-
-            return $this->saveOrder($this->quote, $payapiObject->consumer->email, false, $merchantComment);
-        }
     }
 
-    public function saveOrder($cart, $email, $shippingAddress = false, $messageToMerchant = "")
+    public function saveOrder($cart, $email, $shippingAddress, $messageToMerchant = "")
     {
         $store     = $this->storeManager->getStore();
         $websiteId = $this->storeManager->getStore()->getWebsiteId();
@@ -187,7 +184,8 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         $cart->setCustomerEmail($email);
 
-        if ($shippingAddress) {
+        if ($cart->getShippingAddress()->getFirstname() == 'xxxxx') {
+            $this->customlogger->debug("Address in callback: " . json_encode($shippingAddress));
             $cart->getBillingAddress()->addData($shippingAddress);
             $cart->getShippingAddress()->addData($shippingAddress);
         }
@@ -203,9 +201,9 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->customlogger->debug("SAVED QUOTE WITH ORDER ID " . $order_id);
         $order = $this->orderRepository->get($order_id);
         $msg   = __("Payment %1 event received. ", "processing");
-
+        $this->customlogger->debug("Message to merchant: ".$messageToMerchant);
         if ($messageToMerchant && $messageToMerchant != "") {
-            $msg = $msg . "Client msg: " . $messageToMerchant;
+            $msg = $msg . "\nINFO: " . $messageToMerchant;
         }
 
         $order->addStatusHistoryComment($msg);

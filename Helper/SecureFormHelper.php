@@ -147,7 +147,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        $this->logger->debug("after final address");
+        $this->logger->debug("after final address: " . json_encode($finalAddr));
 
         $quote->getBillingAddress()->addData($finalAddr);
         $quote->getShippingAddress()->addData($finalAddr);
@@ -254,12 +254,9 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $consumer = ["locale" => $locale, "email" => ""];
         }
         if ($shippingAddress && !empty($shippingAddress)) {
-
-            $payapiShipping = [
-                "countryCode" => $shippingAddress['country_id'],
-            ];
-
+            $payapiShipping = [];
             if (isset($shippingAddress["firstname"]) && $shippingAddress["firstname"] != 'xxxxx') {
+                $payapiShipping["countryCode"]   = $shippingAddress['country_id'];
                 $payapiShipping["recipientName"] = $shippingAddress['firstname'] . ' ' . $shippingAddress['lastname'];
                 $payapiShipping["streetAddress"] = $shippingAddress['street'];
                 $payapiShipping["postalCode"]    = $shippingAddress['postcode'];
@@ -292,7 +289,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             "returnUrls"    => $returnUrls,
             "callbacks"     => $jsonCallbacks];
 
-        if (isset($payapiShipping)) {
+        if (isset($payapiShipping) && !empty($payapiShipping)) {
             $res["shippingAddress"] = $payapiShipping;
         }
 
