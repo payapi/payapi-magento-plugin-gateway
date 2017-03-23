@@ -203,7 +203,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
                     "priceInCentsExcVat" => round($item['row_total'] * 100 / $qty),
                     "vatInCents"         => round($item['tax_amount'] * 100 / $qty),
                     "vatPercentage"      => $item['tax_percent'],
-                    "imageUrl"           => $this->store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $item->getProduct()->getImage(),
+                    "imageUrl"           => $this->store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $item->getProduct()->getData('thumbnail')
                 ];
             }
         }
