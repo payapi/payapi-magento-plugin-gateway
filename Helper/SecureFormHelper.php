@@ -3,6 +3,7 @@ namespace Payapi\CheckoutPayment\Helper;
 
 use \Magento\Catalog\Api\ProductRepositoryInterface;
 use \Magento\Framework\App\Helper\Context;
+use \Firebase\JWT\JWT;
 
 class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -36,6 +37,10 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         $paymentMethod               = $paymentHelper->getMethodInstance("payapi_checkoutpayment_secure_form_post");
         $this->defaultShippingMethod = $paymentMethod->getConfigData('instantbuy_shipping_method');
+        $this->payapiApiKey          = $paymentMethod->getConfigData('payapi_api_key');
+        $this->payapiPublicId        = $paymentMethod->getConfigData('payapi_public_id');
+        $this->isStaging             = $paymentMethod->getConfigData('staging');
+
         parent::__construct($context);
     }
 
@@ -343,5 +348,17 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $this->logger->debug("returns null getShippingFromIp");
             return null;
         }
+    }
+
+    public function getJWTSignedData($payapiObject) {
+        $this->logger->debug("getJWTSignedData");
+        $strSigned = JWT::encode($payapiObject, $this->payapiApiKey);
+        $this->logger->debug($strSigned);
+        return $strSigned;
+    }
+
+    public function getSecureFormPostUrl() {        
+        $domain = (($this->isStaging) ? "https://staging-input.payapi.io" : "https://input.payapi.io");        
+        return $domain . '/v1/secureform/' . $this->payapiPublicId;
     }
 }

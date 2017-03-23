@@ -7,8 +7,7 @@ define(
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/model/quote',
         'Magento_Customer/js/customer-data',
-        'mage/url',
-        'payapiSdk'
+        'mage/url'
     ],
     function (
         $,
@@ -94,12 +93,22 @@ define(
                                 type: "POST",
                                 url: "/payapipages/index/secureformgenerator",
                                 data: jsonData,
-                                success: function (data) {
-                                    payapiSdk.configure(window.checkoutConfig.payment.customPayment.payapi_public_id, 
-                                        window.checkoutConfig.payment.customPayment.payapi_api_key,
-                                        window.checkoutConfig.payment.customPayment.payapi_is_staging == "1");
-                                    payapiSdk.postData(data);
-                                }
+                                    success: function(object){
+                                      var form = document.createElement('form');
+                                      form.style.display = 'none';
+                                      form.setAttribute('method', 'POST');
+                                      form.setAttribute('action', object.url);
+                                      form.setAttribute('enctype', 'application/json');
+
+                                      var input = document.createElement('input');
+                                      input.name = 'data';
+                                      input.type = 'text';
+                                      input.setAttribute('value', object.data);
+
+                                      form.appendChild(input);
+                                      document.getElementsByTagName('body')[0].appendChild(form);
+                                      form.submit();
+                                    }
                                 }
                             );
                        /* }

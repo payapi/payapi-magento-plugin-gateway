@@ -54,7 +54,7 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action
                 $ipaddress
             );
 
-            return $result->setData($secureformObject);
+            return $result->setData(["url" => $this->secureFormHelper->getSecureFormPostUrl() , "data" => $this->secureFormHelper->getJWTSignedData($secureformObject)]);
         }
     }
 }
