@@ -40,6 +40,23 @@ php bin/magento setup:di:compile
 php bin/magento setup:static-content:deploy en_GB fi_FI es_ES
 ```
 
+#### Method 3: Magento Marketplace
+* Go to the Magento Marketplace https://marketplace.magento.com/
+* Search for extension “PayApi”
+* Buy the PayApi extension for free
+
+* Login into the magento backend 
+* Go to Settings > Web setup wizard > Component Manager section
+* Sign in with your Magento Marketplace account 
+    ** Access to https://marketplace.magento.com/customer/account/
+    ** Once logged in, go to “My Access key”
+    ** Create new Access key or/and copy the public/private keys generated previously
+    ** Back to your store Admin backend and paste these keys.
+* Press sync button to synchronize with your store
+* Select payapi/* modules to install them.
+* Click “install” button and continue the installation steps.
+
+
 ## Configuration
 * Go to the Magento admin, open the menu option Stores > Configuration > Sales > Payment Methods
 * Open the PayApi extension section and type your PayApi PublicId and your PayApi API key (You can get your publicId and API key from [here](https://input.payapi.io/#!/backoffice/subscription))
