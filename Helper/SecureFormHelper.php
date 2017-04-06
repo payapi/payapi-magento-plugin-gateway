@@ -226,7 +226,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             "vatInCents"                 => round($taxAmount * 100),
             "currency"                   => $this->store->getCurrentCurrencyCode(),
             "referenceId"                => $quoteTmp->getId(), 
-            "tosUrl"                     => "https://magento.payapi.xyz/privacy-policy-cookie-restriction-mode"];
+            "tosUrl"                     => $this->store->getBaseUrl()."privacy-policy-cookie-restriction-mode"];
 
         $shipIncTax = $totals['base_shipping_incl_tax'];
         $shipVat    = $totals['base_shipping_tax_amount'];
