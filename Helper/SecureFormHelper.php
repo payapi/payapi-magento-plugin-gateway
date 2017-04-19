@@ -258,7 +258,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $order = ["sumInCentsIncVat" => round($totalOrdered * 100),
             "sumInCentsExcVat"           => round(($baseExclTax + $shippingAmount) * 100),
             "vatInCents"                 => round($taxAmount * 100),
-            "currency"                   => $this->store->getCurrentCurrencyCode(),
+            "currency"                   => $this->store->getBaseCurrencyCode(),
             "referenceId"                => $quoteTmp->getId(),
             "tosUrl"                     => $this->store->getBaseUrl() . "privacy-policy-cookie-restriction-mode"];
 
