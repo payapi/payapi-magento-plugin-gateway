@@ -41,7 +41,11 @@ define(
                             var shippingMethod = quote.shippingMethod();
                             
                             var jsonProduct = null;
-                            if (shippingMethod != null && typeof shippingMethod.carrier_code != 'undefined') {                                
+                            if (shippingMethod != null && typeof shippingMethod.carrier_code != 'undefined') {    
+                                var vatPercentage = 0;
+                                if(shippingMethod.price_excl_tax != 0){                            
+                                    vatPercentage = parseFloat((shippingMethod.price_incl_tax-shippingMethod.price_excl_tax)*100/shippingMethod.price_excl_tax);
+                                }
                                 jsonProduct = {
                                     "id": shippingMethod.carrier_code+"_"+shippingMethod.method_code,
                                     "quantity" : 1,
@@ -49,7 +53,7 @@ define(
                                     "priceInCentsIncVat" : Math.round(shippingMethod.price_incl_tax*100),
                                     "priceInCentsExcVat" : Math.round(shippingMethod.price_excl_tax*100),
                                     "vatInCents" : Math.round((shippingMethod.price_incl_tax-shippingMethod.price_excl_tax)*100),
-                                    "vatPercentage" : parseFloat((shippingMethod.price_incl_tax-shippingMethod.price_excl_tax)*100/shippingMethod.price_excl_tax)
+                                    "vatPercentage" : vatPercentage
                                 };
                             }
                             

@@ -1,9 +1,9 @@
 <?php
 namespace Payapi\CheckoutPayment\Helper;
 
+use \Firebase\JWT\JWT;
 use \Magento\Catalog\Api\ProductRepositoryInterface;
 use \Magento\Framework\App\Helper\Context;
-use \Firebase\JWT\JWT;
 
 class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -159,32 +159,65 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         $this->logger->debug("after add data");
         // Shipping method
-        $shippingMethod = $this->defaultShippingMethod;
-        if ($shippingExtraProd) {
-            $shippingMethod = $shippingExtraProd["id"];
-        }
-        $this->logger->debug("shippingMethod");
 
-        $shippingRate = $this->shippingRate;
-        $shippingRate
-            ->setCode($shippingMethod)
-            ->getPrice(1);
-        $shippingAddress = $quote->getShippingAddress();
-
-        $shippingAddress->setCollectShippingRates(true)
-            ->collectShippingRates()
-            ->setShippingMethod($shippingMethod); //shipping method
+        $shippingMethod = $this->setShippingInfo($quote->getShippingAddress(), $shippingExtraProd);
 
         $quote->setPaymentMethod('payapi_checkoutpayment_secure_form_post'); //payment method
         $quote->setInventoryProcessed(false);
         $quote->getPayment()->importData(['method' => 'payapi_checkoutpayment_secure_form_post']);
         $quote->collectTotals();
+
+        if (!$shippingExtraProd) {
+            $totals     = $quote->getShippingAddress()->getData();
+            $shipIncTax = $totals['base_shipping_incl_tax'];
+            $shipVat    = $totals['base_shipping_tax_amount'];
+            $shipExcTax = $shipIncTax - $shipVat;
+            if ($shipExcTax != 0) {
+                $shipPercent = $shipVat / $shipExcTax * 100;
+            } else {
+                $shipPercent = 0;
+            }
+            $shippingExtraProd = [
+                "id"                 => $shippingMethod,
+                "quantity"           => 1,
+                "title"              => __('Handling and Delivery'),
+                "priceInCentsIncVat" => round($shipIncTax * 100),
+                "priceInCentsExcVat" => round($shipExcTax * 100),
+                "vatInCents"         => round($shipVat * 100),
+                "vatPercentage"      => $shipPercent];
+        } 
+
+        $quote->getShippingAddress()->setFreeShipping(floatval($shippingExtraProd['priceInCentsIncVat']) == 0);
+
         $quote->save();
 
         return $this->getSecureFormData($quote, $finalAddr, $shippingExtraProd);
     }
 
-    private function getSecureFormData($quoteTmp, $shippingAddress = [], $shippingExtraProd = false)
+    private function getValidShippingMethod(){
+        return $this->defaultShippingMethod;
+    }
+
+    private function setShippingInfo($shippingAddress, $shippingExtraProdOrig)
+    {
+        $shippingMethod = $this->getValidShippingMethod();
+        if ($shippingExtraProdOrig) {
+            $shippingMethod = $shippingExtraProdOrig["id"];
+        }
+
+        $shippingRate = $this->shippingRate;
+        $shippingRate
+            ->setCode($shippingMethod)
+            ->getPrice(1);
+
+        $shippingAddress->setCollectShippingRates(true)
+            ->collectShippingRates()
+            ->setShippingMethod($shippingMethod);
+
+        return $shippingMethod;
+    }
+
+    private function getSecureFormData($quoteTmp, $shippingAddress = [], $shippingExtraProd)
     {
         $this->logger->debug("getSecureFormData");
 
@@ -193,7 +226,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $isVirtual = true;
         if ($items) {
             foreach ($items as $item) {
-                $isVirtual = $isVirtual && $item->getIsVirtual();
+                $isVirtual  = $isVirtual && $item->getIsVirtual();
                 $qty        = $item->getQty();
                 $products[] = [
                     "id"                 => $item->getProductId(),
@@ -203,7 +236,8 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
                     "priceInCentsExcVat" => round($item['row_total'] * 100 / $qty),
                     "vatInCents"         => round($item['tax_amount'] * 100 / $qty),
                     "vatPercentage"      => $item['tax_percent'],
-                    "imageUrl"           => $this->store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $item->getProduct()->getData('thumbnail')
+                    "extraData"          => "quote=" . $quoteTmp->getId(),
+                    "imageUrl"           => $this->store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' . $item->getProduct()->getData('thumbnail'),
                 ];
             }
         }
@@ -225,28 +259,8 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             "sumInCentsExcVat"           => round(($baseExclTax + $shippingAmount) * 100),
             "vatInCents"                 => round($taxAmount * 100),
             "currency"                   => $this->store->getCurrentCurrencyCode(),
-            "referenceId"                => $quoteTmp->getId(), 
-            "tosUrl"                     => $this->store->getBaseUrl()."privacy-policy-cookie-restriction-mode"];
-
-        $shipIncTax = $totals['base_shipping_incl_tax'];
-        $shipVat    = $totals['base_shipping_tax_amount'];
-        $shipExcTax = $shipIncTax - $shipVat;
-        if ($shipExcTax != 0) {
-            $shipPercent = $shipVat / $shipExcTax * 100;
-        } else {
-            $shipPercent = 0;
-        }
-
-        if (!$shippingExtraProd) {
-            $shippingExtraProd = [
-                "id"                 => $this->defaultShippingMethod,
-                "quantity"           => 1,
-                "title"              => __('Handling and Delivery'),
-                "priceInCentsIncVat" => round($shipIncTax * 100),
-                "priceInCentsExcVat" => round($shipExcTax * 100),
-                "vatInCents"         => round($shipVat * 100),
-                "vatPercentage"      => $shipPercent];
-        }
+            "referenceId"                => $quoteTmp->getId(),
+            "tosUrl"                     => $this->store->getBaseUrl() . "privacy-policy-cookie-restriction-mode"];
 
         $products[] = $shippingExtraProd;
 
@@ -350,15 +364,17 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
 
-    public function getJWTSignedData($payapiObject) {
+    public function getJWTSignedData($payapiObject)
+    {
         $this->logger->debug("getJWTSignedData");
         $strSigned = JWT::encode($payapiObject, $this->payapiApiKey);
         $this->logger->debug($strSigned);
         return $strSigned;
     }
 
-    public function getSecureFormPostUrl() {        
-        $domain = (($this->isStaging) ? "https://staging-input.payapi.io" : "https://input.payapi.io");        
+    public function getSecureFormPostUrl()
+    {
+        $domain = (($this->isStaging) ? "https://staging-input.payapi.io" : "https://input.payapi.io");
         return $domain . '/v1/secureform/' . $this->payapiPublicId;
     }
 }

@@ -135,8 +135,10 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function createOrder($payapiObject)
     {
-
-        $extra           = $payapiObject->products[0]->extraData;
+        $extra = '';
+        if(isset($payapiObject->products[0]->extraData)) {
+            $extra           = $payapiObject->products[0]->extraData;
+        }
         $merchantComment = "";
         if (isset($payapiObject->extraInputData)
             && !empty($payapiObject->extraInputData)) {
@@ -153,6 +155,7 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             //POST
             $quoteId            = (int) ($payapiObject->order->referenceId);            
         }
+        $this->customlogger->debug("Quote id: ".$quoteId);
 
         $this->quote        = $this->quoteRepository->get($quoteId);
         $this->stockChanges = $this->checkStock($this->quote->getAllItems());
@@ -160,12 +163,14 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->quote,
                 $payapiObject->consumer->email,
                 $this->getShippingAddress($payapiObject),
-                $merchantComment
+                $merchantComment, 
+                $payapiObject
             );
     }
 
-    public function saveOrder($cart, $email, $shippingAddress, $messageToMerchant = "")
+    public function saveOrder($cart, $email, $shippingAddress, $messageToMerchant = "", $payapiObject)
     {
+        $this->customlogger->debug("Save order!");
         $store     = $this->storeManager->getStore();
         $websiteId = $this->storeManager->getStore()->getWebsiteId();
         $customer  = $this->customerFactory->create();
@@ -184,16 +189,31 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         $cart->setCustomerEmail($email);
 
+        $shipMtd = $cart->getShippingAddress()->getShippingMethod();
         if ($cart->getShippingAddress()->getFirstname() == 'xxxxx') {
             $this->customlogger->debug("Address in callback: " . json_encode($shippingAddress));
             $cart->getBillingAddress()->addData($shippingAddress);
             $cart->getShippingAddress()->addData($shippingAddress);
         }
 
+        $shpIndex = count($payapiObject->products)-1;
+        $isFree = $shpIndex > 0 && intval($payapiObject->products[$shpIndex]->priceInCentsIncVat) == 0;
+        $cart->getShippingAddress()->setFreeShipping($isFree);
+
+        $cart->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates()
+            ->setShippingMethod($shipMtd);
+        $rate = $cart->getShippingAddress()->getShippingRateByCode($shipMtd);
+        if($rate){
+            $addressDesc = $rate->getCarrierTitle() . ' - ' . $rate->getMethodTitle();
+            $cart->getShippingAddress()->setShippingDescription(trim($addressDesc, ' -'));
+        }else{
+            $this->customlogger->debug("ORDER WILL NOT BE CREATED, BUT IT IS PAID. SHIPPING METHOD IS DISABLED: ".$shipMtd);
+            $cart->getShippingAddress()->setShippingDescription($shipMtd);
+        }
+        
         // Submit the quote and create the order
         $cart->save();
-
-        $cart     = $this->cartRepositoryInterface->get($cart->getId());
+        $this->customlogger->debug("Cart saved!");
         $order_id = $this->cartManagementInterface->placeOrder($cart->getId());
 
         $cart->setOrigOrderId($order_id);

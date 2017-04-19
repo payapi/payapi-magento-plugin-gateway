@@ -17,4 +17,16 @@ class AllActiveShippingMethods extends \Magento\Shipping\Model\Config\Source\All
     {
         return parent::toOptionArray(true);
     }
+
+    public function contains($id){
+      $ids = explode("_", $id);
+      $options = $this->toOptionArray();
+      if(isset($options[$ids[0]])){
+        $list = $options[$ids[0]]['value'];
+        foreach ($list as $method) {
+         if($method['value'] == $id) return true;
+        }
+      }
+      return false;
+    }
 }
