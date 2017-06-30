@@ -10,18 +10,29 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action
         \Payapi\CheckoutPayment\Logger\Logger $logger,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Payapi\CheckoutPayment\Helper\SecureFormHelper $secureFormHelper,
-        \Magento\Checkout\Model\Cart $currentCart
+        \Magento\Checkout\Model\Cart $currentCart,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,      
+        \Magento\Framework\App\Config\ConfigResource\ConfigInterface $mutableScopeConfig
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->secureFormHelper  = $secureFormHelper;
         $this->currentCart       = $currentCart;
         $this->logger            = $logger;
         $this->context           = $context;
+        $this->scopeConfig = $scopeConfig;
+        $this->mutableScopeConfig = $mutableScopeConfig;
         parent::__construct($context);
     }
 
     public function execute()
     {
+        $scopeConfig = $this->scopeConfig;
+        if ($scopeConfig->getValue('general/region/state_required') != ""){
+            $this->mutableScopeConfig->saveConfig("general/region/state_required", "",  
+                \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 
+                null);     
+        }
+
         $result = $this->resultJsonFactory->create();
         if ($this->getRequest()->isAjax()) {
             $this->logger->debug("EXECUTE IS AJAX");

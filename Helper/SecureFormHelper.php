@@ -110,7 +110,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $customer = null;
         if ($this->customerSession->isLoggedIn()) {
             $customer = $this->customerSession->getCustomer();
-            $quote->assignCustomer($customer); //Assign quote to customer
+            //$quote->assignCustomer($customer); //Assign quote to customer
             $quote->setCustomerEmail($customer->getEmail());
             $userAddress = $customer->getDefaultShipping();
         } else {

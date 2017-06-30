@@ -26,7 +26,9 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\DB\Transaction $transaction,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Sales\Model\Order\Email\Sender\InvoiceSender $invoiceSender,
-        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository
+        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository,        
+        \Magento\Directory\Model\CountryFactory $countryFactory,
+        \Magento\Framework\App\Config\ConfigResource\ConfigInterface $mutableScopeConfig
     ) {
 
         $this->storeManager            = $storeManager;
@@ -42,6 +44,10 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->quoteRepository         = $quoteRepository;
         $this->invoiceSender           = $invoiceSender;
         $this->stockItemRepository     = $stockItemRepository;
+        $this->countryFactory          = $countryFactory;
+        $this->mutableScopeConfig      = $mutableScopeConfig;
+
+        $this->scopeConfig = $context->getScopeConfig();
         parent::__construct($context);
     }
 
@@ -119,14 +125,46 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $telephone = "0";
         }
 
+        /*
+            FOR REGIONS!!!!!!
+        $country = $this->countryFactory->create();
+        $country->loadByCode($payapiObject->shippingAddress->countryCode);
+        $regions = $country->getRegions()->toOptionArray();
+
+        $selectedRegion = null;
+        $defaultRegion = null;
+        foreach ($regions as $region) {
+            if ($region['title'] != null){
+            if ($defaultRegion == null) {
+                $defaultRegion = $region;
+            }
+            $compareDiffs = strcasecmp($region['title'], $payapiObject->shippingAddress->stateOrProvince);
+            $this->customlogger->debug("COMPARE DIFFS: ".$compareDiffs . " ". $region['title']);
+            if(abs($compareDiffs) < 3) {
+                
+            $this->customlogger->debug("FOUND REGION: ".json_encode($region));
+                $selectedRegion = $region;
+            }
+        }
+        }
+
+        if($selectedRegion == null){
+            $this->customlogger->debug("NOT FOUND REGION");
+            $selectedRegion = $defaultRegion;            
+            $selectedRegion["title"] = $payapiObject->shippingAddress->stateOrProvince;
+            $this->customlogger->debug("SELECTED FIRST REGION: ".json_encode($selectedRegion));
+        }
+
+        $this->customlogger->debug("SELECTED REGION: ".json_encode($selectedRegion));
+        */
+
         return [
             'firstname'            => $payapiObject->shippingAddress->recipientName, //address Details
             'lastname'             => '.',
             'street'               => $payapiObject->shippingAddress->streetAddress,
             'street2'              => $payapiObject->shippingAddress->streetAddress2,
             'city'                 => $payapiObject->shippingAddress->city,
-            'country_id'           => $payapiObject->shippingAddress->countryCode,
-            'region'               => $payapiObject->shippingAddress->stateOrProvince,
+            'country_id'           => $payapiObject->shippingAddress->countryCode,            
             'postcode'             => $payapiObject->shippingAddress->postalCode,
             'telephone'            => $telephone,
             'save_in_address_book' => 0,
@@ -180,6 +218,12 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $cart->setStore($store);
         $cart->setCurrency();
 
+        if ($this->scopeConfig->getValue('general/region/state_required') != ""){
+            $this->mutableScopeConfig->saveConfig("general/region/state_required", "",  
+                \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 
+                null);        
+        }
+
         if ($customer->getEntityId()) {
             $customer = $this->customerRepository->getById($customer->getEntityId());
             $cart->assignCustomer($customer); //Assign quote to customer
@@ -190,10 +234,11 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $cart->setCustomerEmail($email);
 
         $shipMtd = $cart->getShippingAddress()->getShippingMethod();
-        if ($cart->getShippingAddress()->getFirstname() == 'xxxxx') {
-            $this->customlogger->debug("Address in callback: " . json_encode($shippingAddress));
+     
+        if ($cart->getShippingAddress()->getFirstname() == 'xxxxx') {            
+            $this->customlogger->debug("Address  " . json_encode($shippingAddress));
             $cart->getBillingAddress()->addData($shippingAddress);
-            $cart->getShippingAddress()->addData($shippingAddress);
+            $cart->getShippingAddress()->addData($shippingAddress);           
         }
 
         $shpIndex = count($payapiObject->products)-1;
