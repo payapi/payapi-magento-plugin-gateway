@@ -17,7 +17,7 @@
                 <fieldset_css>payapi-method</fieldset_css>
                 <label>PayApi Online Secure Payment</label>
                 <comment>
-                    <![CDATA[<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Click here to sign up for a PayApi account</a>]]>
+                    <![CDATA[<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Click here to sign up for an account</a><script type='text/javascript'> setTimeout(function(){ console.log(payapiPartner); document.getElementById('payapi-logo').src=payapiPartner.data.partnerLogoUrl; document.querySelector('a[id*=payapi_checkoutpayment_secure_form]').innerHTML = payapiPartner.data.partnerName+ " - "+payapiPartner.data.partnerSlogan;},250);</script>]]>
                 </comment>
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enabled</label>

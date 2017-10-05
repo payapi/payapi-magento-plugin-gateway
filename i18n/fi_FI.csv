@@ -1,5 +1,5 @@
 "PayApi Online Secure Payment","PayApi Online Maksupalvelu",module,Payapi_CheckoutPayment
-"<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Click here to sign up for a PayApi account</a>","<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Klikkaa tästä rekisteröidäksesi PayApi tunnuksen</a>",module,Payapi_CheckoutPayment
+"<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Click here to sign up for an account</a>","<div class='config-heading'><img id='payapi-logo'/></div><br/><a href='https://input.payapi.io/' target='_blank'>Klikkaa tästä rekisteröidäksesi tunnuksen</a>",module,Payapi_CheckoutPayment
 "Enabled","Päällä",module,Payapi_CheckoutPayment
 "PayApi Public Id","PayApi Public ID",module,Payapi_CheckoutPayment
 "PayApi Api Key","PayApi API Key",module,Payapi_CheckoutPayment

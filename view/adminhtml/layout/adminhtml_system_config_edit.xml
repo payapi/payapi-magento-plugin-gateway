@@ -9,6 +9,11 @@
     <head>
         <css src="Payapi_CheckoutPayment::styles.css"/>
     </head>
-    <body>        
+    <body> 
+        <referenceContainer name="content">
+        <block class="Payapi\CheckoutPayment\Block\Adminhtml\PayapiPluginConfiguration"
+            template="Payapi_CheckoutPayment::payapiconfig.phtml">
+        </block>
+        </referenceContainer>       
     </body>
 </page>

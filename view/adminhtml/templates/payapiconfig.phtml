@@ -1,0 +1,9 @@
+<div>
+<?php if ($block->checkPayApiConfiguration()) {?>  
+<script type="text/javascript">
+  var jsObj = '<?php echo json_encode($block->getPartner());?>';
+  var payapiPartner = JSON.parse(jsObj);
+
+</script>
+<?php }?>
+</div>

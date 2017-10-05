@@ -1,6 +1,3 @@
 
 
 .payapi-method > .comment > .config-heading:before { content:url(images/credit-cards.png);float:right;}
-#payapi-logo {
-    content: url("images/logo-payapi.png");
-}

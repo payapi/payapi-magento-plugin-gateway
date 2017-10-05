@@ -47,24 +47,29 @@ class PayapiCallback implements PayapiCallbackInterface
 
         if ($jsonData->payment->status == 'processing') {
             //Processing async payment
+            $this->logger->debug("PROCESSING CALLBACK...");
             $order_id = $this->helper->createOrder($jsonData);
             $result   = ['platform' => 'magento', 'order_id' => $order_id];
         } else {
             $orderId = $this->getOrderId($jsonData);
             if ($orderId) {
                 if ($jsonData->payment->status == 'successful') {
+                    $this->logger->debug("SUCCESSFUL CALLBACK...");
                     //Payment success
                     $order_id = $this->helper->addPayment($orderId);
                     $result   = ['platform' => 'magento', 'order_id' => $order_id];
                 } elseif ($jsonData->payment->status == 'failed') {
                     //Payment failure
+                    $this->logger->debug("FAILED CALLBACK...");
                     $order_id = $this->helper->changeStatus($orderId, "canceled", "canceled", "failed");
                     $result   = ['platform' => 'magento', 'order_id' => $order_id];
                 } elseif ($jsonData->payment->status == 'cancelled') {
                     //Payment failure
+                    $this->logger->debug("CANCELLED CALLBACK...");
                     $order_id = $this->helper->changeStatus($orderId, "canceled", "canceled", "cancelled");
                     $result   = ['platform' => 'magento', 'order_id' => $order_id]; 
                 } elseif ($jsonData->payment->status == 'chargeback') {
+                    $this->logger->debug("CHARGEBACK CALLBACK...");
                     $order_id = $this->helper->changeStatus(
                         $orderId,
                         "payment_review",
@@ -75,6 +80,7 @@ class PayapiCallback implements PayapiCallbackInterface
                     $result = ['platform' => 'magento', 'order_id' => $order_id];
                 } else {
                     //Payment cancelled
+                    $this->logger->debug("STATUS CALLBACK: ".$jsonData->payment->status);
                     $order_id = $this->helper->changeStatus(
                         $orderId,
                         "payment_review",
@@ -88,8 +94,10 @@ class PayapiCallback implements PayapiCallbackInterface
         }
 
         if (isset($result)) {
+            $this->logger->debug(json_encode($result));
             return json_encode($result);
         } else {
+            $this->logger->debug("KO. COULD NOT CREATE ORDER OR ADD PAYMENT");
             throw new \Magento\Framework\Exception\LocalizedException(__('Could not create the order correctly.'));
         }
     }
