@@ -19,6 +19,7 @@ class PayapiPluginConfiguration extends \Magento\Framework\View\Element\Template
         $this->paymentHelper = $paymentHelper;
         $this->remoteAddress = $remoteAddress;
         $this->allShippingMethods = $allShippingMethods;
+        $this->sdk = false;
         parent::__construct($context, $data);
     }
 
@@ -35,10 +36,11 @@ class PayapiPluginConfiguration extends \Magento\Framework\View\Element\Template
         $checkOk = $this->isEnabled && isset($this->payapiPublicId) && isset($this->payapiApiKey) && isset($this->instantBuyDefaultShipping) && is_string($this->instantBuyDefaultShipping) && strlen($this->instantBuyDefaultShipping) > 0 && $this->allShippingMethods->contains($this->instantBuyDefaultShipping);
         if ($checkOk){            
             $config = [ "staging" => $this->isStaging == '1' , "debug" => $this->isStaging == '1'];
-            $this->sdk = new payapiSdk($config, 'magento');
-            //TODO MOVE TO ADMIN, WHEN PAYAPI DATA IS SAVED. REPLACE FOR SETTINGS()
-            $resp = $this->sdk->settings($this->payapiPublicId, $this->payapiApiKey);//, true); TO REFRESH            
-            $this->logger->debug("PAYAPI PLUGIN CONFIG ".json_encode($resp));
+            if(!$this->sdk){
+                $this->sdk = new payapiSdk($config, 'magento');
+                //TODO MOVE TO ADMIN, WHEN PAYAPI DATA IS SAVED. REPLACE FOR SETTINGS()
+            }
+            $resp = $this->sdk->settings($this->payapiPublicId, $this->payapiApiKey);//, true); TO REFRESH                        
             return $resp['code'] === 200;
         }
 
