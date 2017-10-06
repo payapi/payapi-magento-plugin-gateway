@@ -14,6 +14,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Quote\Api\CartRepositoryInterface $cartRepositoryInterface,
         \Magento\Quote\Api\CartManagementInterface $cartManagementInterface,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\Payment\Helper\Data $paymentHelper,
         \Magento\Quote\Model\Quote\Address\Rate $shippingRate,
@@ -34,6 +35,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
         $this->objectFactory           = $objectFactory;
         $this->customerSession         = $currentCart->getCustomerSession();
         $this->scopeConfig             = $context->getScopeConfig();
+        $this->addressRepository       = $addressRepository;
 
         $paymentMethod               = $paymentHelper->getMethodInstance("payapi_checkoutpayment_secure_form_post");
         $this->defaultShippingMethod = $paymentMethod->getConfigData('instantbuy_shipping_method');
@@ -112,7 +114,30 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             $customer = $this->customerSession->getCustomer();
             //$quote->assignCustomer($customer); //Assign quote to customer
             $quote->setCustomerEmail($customer->getEmail());
-            $userAddress = $customer->getDefaultShipping();
+            $userAddressId = $customer->getDefaultShipping();
+            if($userAddressId) {
+                $userAddressObj = $this->addressRepository->getById($userAddressId); 
+                $region = '';
+                if($userAddressObj->getRegion() != null && $userAddressObj->getRegion()->getRegionCode() != null) {
+                    $region = $userAddressObj->getRegion()->getRegionCode();
+                }
+
+                $userAddress = [
+                    'firstname'            => $userAddressObj->getFirstname(), //address Details
+                    'lastname'             => $userAddressObj->getLastname(),
+                    'street'               => $userAddressObj->getStreet()[0],
+                    'city'                 => $userAddressObj->getCity(),
+                    'country_id'           => $userAddressObj->getCountryId(),
+                    'region'               => $region,
+                    'postcode'             => $userAddressObj->getPostcode(),
+                    'telephone'            => $userAddressObj->getTelephone(),
+                    'fax'                  => 0,
+                    'save_in_address_book' => 0,
+                ];
+                $this->logger->debug("userAddress ". json_encode($userAddress));
+            }else{
+                $userAddress = null; 
+            }
         } else {
             $quote->setCustomerIsGuest(true);
             $userAddress = null;
