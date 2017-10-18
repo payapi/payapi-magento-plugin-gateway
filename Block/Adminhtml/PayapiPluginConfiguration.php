@@ -35,11 +35,13 @@ class PayapiPluginConfiguration extends \Magento\Framework\View\Element\Template
 
         $checkOk = $this->isEnabled && isset($this->payapiPublicId) && isset($this->payapiApiKey) && isset($this->instantBuyDefaultShipping) && is_string($this->instantBuyDefaultShipping) && strlen($this->instantBuyDefaultShipping) > 0 && $this->allShippingMethods->contains($this->instantBuyDefaultShipping);
         if ($checkOk){            
-            $config = [ "staging" => $this->isStaging == '1' , "debug" => $this->isStaging == '1'];
+            $config = ["debug" => $this->isStaging == '1'];
             if(!$this->sdk){
                 $this->sdk = new payapiSdk($config, 'magento');
                 //TODO MOVE TO ADMIN, WHEN PAYAPI DATA IS SAVED. REPLACE FOR SETTINGS()
             }
+            // $staging = $this->isStaging == '1'; 
+            // TODO ADD FIRST PARAMETER OF SETTINGS BOOLEAN IS STAGING/PRODUCTION
             $resp = $this->sdk->settings($this->payapiPublicId, $this->payapiApiKey);//, true); TO REFRESH                        
             return $resp['code'] === 200;
         }

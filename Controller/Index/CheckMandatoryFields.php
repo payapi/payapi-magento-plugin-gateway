@@ -2,6 +2,7 @@
 namespace Payapi\CheckoutPayment\Controller\Index;
 
 use Magento\Framework\App\Action\Context;
+use Payapi\PaymentsSdk\payapiSdk;
 
 class CheckMandatoryFields extends \Magento\Framework\App\Action\Action
 {
@@ -9,13 +10,29 @@ class CheckMandatoryFields extends \Magento\Framework\App\Action\Action
         Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Catalog\Model\ProductFactory $productloader,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository
     ) {
         $this->resultJsonFactory   = $resultJsonFactory;
         $this->productloader       = $productloader;
+        $this->storeManager        = $storeManager;
         $this->stockItemRepository = $stockItemRepository;
+        $this->sdk = new payapiSdk();
+        $this->sdk->settings();
+        
         parent::__construct($context);
     }
+
+    public function getPriceInclTax($product)
+    {
+        $price = $product->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+        return $price;         
+    }
+
+    public function getCurrentCurrencyCode()
+    {
+        return $this->storeManager->getStore()->getCurrentCurrencyCode();
+    } 
 
     public function execute()
     {
@@ -50,6 +67,8 @@ class CheckMandatoryFields extends \Magento\Framework\App\Action\Action
                             $jsonResponse[$id][0] = 1; //Fill with mandatory fields to redirect to the product page
                         }
                         $jsonResponse[$id][1] = $stockItem->getMinSaleQty();
+                        $partialPay = $this->sdk->partialPayment($this->getPriceInclTax($product)*100, $this->getCurrentCurrencyCode());
+                        $jsonResponse[$id][2] = ($partialPay && $partialPay['code']==200)?1:0;
                     }
                 }
 

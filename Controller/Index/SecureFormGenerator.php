@@ -40,6 +40,7 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action
             $shippingExtraProd = $this->getRequest()->getPostValue('shippingProduct', false);
             $checkoutAddress   = $this->getRequest()->getPostValue('checkoutAddress', false);
             $ipaddress         = $this->getRequest()->getPostValue('ipaddress');
+            $partialPayment    = $this->getRequest()->getPostValue('partialPayment', false);
 
             if (!$ipaddress || $ipaddress == "") {
                 $ipaddress = $this->getRequest()->getClientIp();
@@ -64,6 +65,10 @@ class SecureFormGenerator extends \Magento\Framework\App\Action\Action
                 $checkoutAddress,
                 $ipaddress
             );
+
+            if($partialPayment){
+                $secureformObject['order']['preselectedPartialPayment'] = $partialPayment;
+            }
 
             return $result->setData(["url" => $this->secureFormHelper->getSecureFormPostUrl() , "data" => $this->secureFormHelper->getJWTSignedData($secureformObject)]);
         }
