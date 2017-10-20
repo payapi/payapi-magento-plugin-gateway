@@ -87,10 +87,9 @@ class PayapiPluginConfiguration extends \Magento\Framework\View\Element\Template
 		return $this->sdk;
 	}
 
-	public function getPartner() {
-		$partnerId = 'payapi'; //'payapi'
+	public function getPartner() {		
 		if (isset($this->sdk)) {
-			return $this->sdk->branding($partnerId);
+			return $this->sdk->branding();
 		}
 		return false;
 	}
