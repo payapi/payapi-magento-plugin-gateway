@@ -53,6 +53,7 @@ class PayapiCallback implements PayapiCallbackInterface
         } else {
             $orderId = $this->getOrderId($jsonData);
             if ($orderId) {
+                setcookie('fngrPayapiReturningConsumer', "", -1);
                 if ($jsonData->payment->status == 'successful') {
                     $this->logger->debug("SUCCESSFUL CALLBACK...");
                     //Payment success
