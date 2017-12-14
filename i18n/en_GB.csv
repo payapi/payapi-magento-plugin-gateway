@@ -25,7 +25,7 @@
 "failed","failed",module,Payapi_CheckoutPayment
 "Payment %1 event received","Payment %1 event received",module,Payapi_CheckoutPayment
 "Notified customer about invoice #%1","Notified customer about invoice #%1",module,Payapi_CheckoutPayment
-"Please fill in all of the required fields","Please fill in all of the required fields",module,Payapi_CheckoutPayment
+"Please select or fill in all of the required fields","Please select or fill in all of the required fields",module,Payapi_CheckoutPayment
 "Processing payment","Processing payment",module,Payapi_CheckoutPayment
 "Payment cancelled","Payment cancelled",module,Payapi_CheckoutPayment
 "Payment failed","Payment failed",module,Payapi_CheckoutPayment

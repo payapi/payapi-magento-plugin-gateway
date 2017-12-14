@@ -184,15 +184,17 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
         $this->logger->debug("after add data");
         // Shipping method
-
-        $shippingMethod = $this->setShippingInfo($quote->getShippingAddress(), $shippingExtraProd);
+        $isFree = $shippingExtraProd && floatval($shippingExtraProd['priceInCentsIncVat']) == 0;
+        $this->logger->debug("after add data ".$isFree);
+        if(!$isFree) {
+            $shippingMethod = $this->setShippingInfo($quote->getShippingAddress(), $shippingExtraProd);
+        }
 
         $quote->setPaymentMethod('payapi_checkoutpayment_secure_form_post'); //payment method
         $quote->setInventoryProcessed(false);
         $quote->getPayment()->importData(['method' => 'payapi_checkoutpayment_secure_form_post']);
         $quote->collectTotals();
-
-        if (!$shippingExtraProd) {
+        if (!$shippingExtraProd && !$isFree) {
             $totals     = $quote->getShippingAddress()->getData();
             $shipIncTax = $totals['base_shipping_incl_tax'];
             $shipVat    = $totals['base_shipping_tax_amount'];
@@ -211,9 +213,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
                 "vatInCents"         => round($shipVat * 100),
                 "vatPercentage"      => $shipPercent];
         } 
-
-        $quote->getShippingAddress()->setFreeShipping(floatval($shippingExtraProd['priceInCentsIncVat']) == 0);
-
+        $quote->getShippingAddress()->setFreeShipping($isFree);
         $quote->save();
 
         return $this->getSecureFormData($quote, $finalAddr, $shippingExtraProd);
@@ -287,7 +287,9 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
             "referenceId"                => $quoteTmp->getId(),
             "tosUrl"                     => $this->store->getBaseUrl() . "privacy-policy-cookie-restriction-mode"];
 
-        $products[] = $shippingExtraProd;
+        if($shippingExtraProd) {
+            $products[] = $shippingExtraProd;
+        }
 
         //Consumer
         $locale = str_replace("_", "-", $this->resolver->getLocale());
@@ -391,6 +393,7 @@ class SecureFormHelper extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getJWTSignedData($payapiObject)
     {
+        $this->logger->debug($this->payapiApiKey);
         $this->logger->debug("getJWTSignedData");
         $strSigned = JWT::encode($payapiObject, $this->payapiApiKey);
         $this->logger->debug($strSigned);

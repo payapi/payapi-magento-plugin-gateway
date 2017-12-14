@@ -48,8 +48,13 @@ class CheckMandatoryFields extends \Magento\Framework\App\Action\Action
                 $stockItem            = $this->stockItemRepository->get($id);
                 $customOptions        = $product->getProductOptionsCollection();
 
+
+                if($product->getTypeId() == \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE && $product->getCustomAttribute('links_purchased_separately', false)) {
+                        $jsonResponse[$id][0] = 1;                    
+                }
+
                 if ($customOptions) {
-                    foreach ($customOptions as $o) {
+                    foreach ($customOptions as $o) {                        
                         if ($o->getIsRequire()) {
                             // or another title of option
                             $jsonResponse[$id][0] = 1;
@@ -59,11 +64,11 @@ class CheckMandatoryFields extends \Magento\Framework\App\Action\Action
                 }
 
                 if ($stockItem) {
-                    if (!$stockItem->getIsInStock()) {
+                    if ($stockItem->getManageStock() && !$stockItem->getIsInStock()) {
                         $jsonResponse[$id][0] = 1; //Fill with mandatory fields to redirect to the product page
                         $jsonResponse[$id][1] = 0;
                     } else {
-                        if ($stockItem->getMinSaleQty() > $stockItem->getQty()) {
+                        if ($stockItem->getManageStock() && (($stockItem->getMinSaleQty() > $stockItem->getQty()) || $stockItem->getQty() <= 0)) {
                             $jsonResponse[$id][0] = 1; //Fill with mandatory fields to redirect to the product page
                         }
                         $jsonResponse[$id][1] = $stockItem->getMinSaleQty();

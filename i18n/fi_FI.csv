@@ -24,7 +24,7 @@
 "failed","failed",module,Payapi_CheckoutPayment
 "Payment %1 event received","Maksu %1 tapahtuma vastaanotettu",module,Payapi_CheckoutPayment
 "Notified customer about invoice #%1","Asiakasta informoitu laskusta #%1",module,Payapi_CheckoutPayment
-"Please fill in all of the required fields","Ole hyvä ja täytä pakolliset kentät",module,Payapi_CheckoutPayment
+"Please select or fill in all of the required fields","Ole hyvä ja täytä pakolliset kentät",module,Payapi_CheckoutPayment
 "Processing payment","Maksu on käsittelyssä",module,Payapi_CheckoutPayment
 "Payment cancelled","Maksu ei onnistunut",module,Payapi_CheckoutPayment
 "Payment failed","Maksu hylätty",module,Payapi_CheckoutPayment

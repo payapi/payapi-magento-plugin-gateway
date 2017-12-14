@@ -24,7 +24,7 @@
 "failed","fallido",module,Payapi_CheckoutPayment
 "Payment %1 event received","Evento de pago %1 recibido",module,Payapi_CheckoutPayment
 "Notified customer about invoice #%1","Notificación al cliente de la factura #%1",module,Payapi_CheckoutPayment
-"Please fill in all of the required fields","Por favor, rellene todos los campos obligatorios",module,Payapi_CheckoutPayment
+"Please select or fill in all of the required fields","Por favor, seleccione o rellene todos los campos obligatorios",module,Payapi_CheckoutPayment
 "Processing payment","Pago procesado",module,Payapi_CheckoutPayment
 "Payment cancelled","Payment cancelado",module,Payapi_CheckoutPayment
 "Payment failed","Payment erróneo",module,Payapi_CheckoutPayment

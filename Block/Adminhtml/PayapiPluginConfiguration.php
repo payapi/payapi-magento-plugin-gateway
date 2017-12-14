@@ -43,10 +43,12 @@ class PayapiPluginConfiguration extends \Magento\Framework\View\Element\Template
 
 			if ($refreshMerchantSettings) {
 				$resp = $this->sdk->settings($this->isStaging == '1', $this->payapiPublicId, $this->payapiApiKey);
+				$this->logger->debug("Refreshing merchant settings for PA Config: Staging: ".$this->isStaging. " PublicId: ". $this->payapiPublicId." APIKey: ". $this->payapiApiKey);
 			} else {
 				$resp = $this->sdk->settings();
 				if ($resp['code'] != 200) {
 					$resp = $this->sdk->settings($this->isStaging == '1', $this->payapiPublicId, $this->payapiApiKey);
+					$this->logger->debug("New merchant settings for PA Config: Staging: ".$this->isStaging. " PublicId: ". $this->payapiPublicId." APIKey: ". $this->payapiApiKey);
 				}
 			}
 

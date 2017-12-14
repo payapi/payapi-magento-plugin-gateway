@@ -242,20 +242,20 @@ class CreateOrderHelper extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $shpIndex = count($payapiObject->products)-1;
-        $isFree = $shpIndex > 0 && intval($payapiObject->products[$shpIndex]->priceInCentsIncVat) == 0;
+        $isFree = $shpIndex<=0 || ($shpIndex > 0 && intval($payapiObject->products[$shpIndex]->priceInCentsIncVat) == 0);
         $cart->getShippingAddress()->setFreeShipping($isFree);
-
-        $cart->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates()
-            ->setShippingMethod($shipMtd);
-        $rate = $cart->getShippingAddress()->getShippingRateByCode($shipMtd);
-        if($rate){
-            $addressDesc = $rate->getCarrierTitle() . ' - ' . $rate->getMethodTitle();
-            $cart->getShippingAddress()->setShippingDescription(trim($addressDesc, ' -'));
-        }else{
-            $this->customlogger->debug("ORDER WILL NOT BE CREATED, BUT IT IS PAID. SHIPPING METHOD IS DISABLED: ".$shipMtd);
-            $cart->getShippingAddress()->setShippingDescription($shipMtd);
+        if(!$isFree){
+            $cart->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates()
+                ->setShippingMethod($shipMtd);
+            $rate = $cart->getShippingAddress()->getShippingRateByCode($shipMtd);
+            if($rate){
+                $addressDesc = $rate->getCarrierTitle() . ' - ' . $rate->getMethodTitle();
+                $cart->getShippingAddress()->setShippingDescription(trim($addressDesc, ' -'));
+            }else{
+                $this->customlogger->debug("ORDER WILL NOT BE CREATED, BUT IT IS PAID. SHIPPING METHOD IS DISABLED: ".$shipMtd);
+                $cart->getShippingAddress()->setShippingDescription($shipMtd);
+            }
         }
-        
         // Submit the quote and create the order
         $cart->save();
         $this->customlogger->debug("Cart saved!");
